@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboards n01darts</title>
+<style>
+  :root{--bg0:#0a0e1a; --bg1:#10162a; --card:rgba(26,33,52,.72); --border:rgba(255,255,255,.08);
+    --text:#eef2fa; --muted:#8d97ad; --blue:#4f8ef7; --green:#34d399}
+  *{box-sizing:border-box; margin:0; padding:0}
+  body{min-height:100vh; display:flex; align-items:center; justify-content:center; color:var(--text);
+    font:15px/1.5 -apple-system,'Segoe UI',Arial,sans-serif; padding:24px;
+    background:
+      radial-gradient(900px 500px at 85% -10%, rgba(79,142,247,.18), transparent 60%),
+      radial-gradient(700px 450px at -10% 30%, rgba(167,139,250,.12), transparent 60%),
+      linear-gradient(180deg, var(--bg0), var(--bg1));
+    background-attachment:fixed}
+  main{max-width:560px; width:100%}
+  h1{font-size:26px; font-weight:800; letter-spacing:-.3px; margin-bottom:4px;
+    background:linear-gradient(90deg,#fff,#9db8ef); -webkit-background-clip:text; background-clip:text; color:transparent}
+  p{color:var(--muted); font-size:13px; margin-bottom:22px}
+  a.card{display:block; background:var(--card); border:1px solid var(--border); border-radius:18px;
+    padding:20px 22px; margin-bottom:14px; text-decoration:none; color:var(--text);
+    backdrop-filter:blur(12px); transition:border-color .25s, transform .15s, box-shadow .25s}
+  a.card:hover{border-color:rgba(255,255,255,.2); transform:translateY(-2px); box-shadow:0 10px 40px rgba(0,0,0,.35)}
+  a.card h2{font-size:17px; display:flex; align-items:center; gap:10px}
+  .dot{width:10px; height:10px; border-radius:3px; display:inline-block}
+  a.card span{color:var(--muted); font-size:13px; display:block; margin-top:4px}
+  footer{color:var(--muted); font-size:11px; margin-top:10px}
+</style>
+</head>
+<body>
+<main>
+  <h1>Dashboards n01darts</h1>
+  <p>Estadísticas en vivo de torneos de n01darts. Pega la URL del torneo o usa los enlaces guardados con parámetros.</p>
+  <a class="card" href="dashboard.html?id=t_bn9O_4432">
+    <h2><i class="dot" style="background:var(--blue)"></i>Dashboard del torneo</h2>
+    <span>Rankings de jugadores y equipos: medias, 180s, cierres, best legs. Abre con la Lliga Catalana 1a Divisió por defecto.</span>
+  </a>
+  <a class="card" href="equipo.html?id=t_bn9O_4432&team=Jexk">
+    <h2><i class="dot" style="background:var(--green)"></i>Dashboard de equipo</h2>
+    <span>Estadísticas de un equipo y sus jugadores. Abre con CEDSAB por defecto; cambia de equipo en el desplegable.</span>
+  </a>
+  <footer>Datos: API pública de n01darts, consultados en vivo al cargar cada página.</footer>
+</main>
+</body>
+</html>

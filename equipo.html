@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard de equipo · n01darts (responsive)</title>
+<style>
+  :root{
+    --bg0:#0a0e1a; --bg1:#10162a; --card:rgba(26,33,52,.72); --border:rgba(255,255,255,.08);
+    --text:#eef2fa; --muted:#8d97ad; --blue:#4f8ef7; --green:#34d399; --amber:#fbbf24;
+    --pink:#f472b6; --cyan:#22d3ee; --violet:#a78bfa;
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  body{
+    min-height:100vh; color:var(--text); font:14px/1.5 -apple-system,'Segoe UI',Arial,sans-serif;
+    background:
+      radial-gradient(900px 500px at 85% -10%, rgba(79,142,247,.18), transparent 60%),
+      radial-gradient(700px 450px at -10% 30%, rgba(167,139,250,.12), transparent 60%),
+      radial-gradient(800px 500px at 50% 110%, rgba(34,211,238,.10), transparent 60%),
+      linear-gradient(180deg, var(--bg0), var(--bg1));
+    background-attachment:fixed; padding:24px 20px;
+  }
+  header{max-width:1320px; margin:0 auto 20px}
+  h1{
+    font-size:24px; font-weight:800; letter-spacing:-.3px;
+    background:linear-gradient(90deg,#fff,#9db8ef); -webkit-background-clip:text;
+    background-clip:text; color:transparent;
+  }
+  .sub{color:var(--muted); font-size:12px; margin-top:2px}
+  .controls{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; align-items:center}
+  .controls input[type=text]{
+    flex:1; min-width:280px; background:rgba(255,255,255,.05); border:1px solid var(--border);
+    color:var(--text); padding:11px 14px; border-radius:12px; font-size:13px; outline:none;
+    transition:border-color .25s, box-shadow .25s;
+  }
+  .controls input[type=text]:focus{border-color:var(--blue); box-shadow:0 0 0 3px rgba(79,142,247,.25)}
+  .controls select{
+    background:rgba(255,255,255,.05); border:1px solid var(--border); color:var(--text);
+    padding:10px 12px; border-radius:12px; font-size:13px; outline:none; cursor:pointer; min-width:200px;
+  }
+  .controls select option{background:var(--bg1)}
+  .controls button{
+    background:linear-gradient(135deg,#4f8ef7,#7b5cf0); border:none; color:#fff; padding:11px 22px;
+    border-radius:12px; font-size:13px; font-weight:700; cursor:pointer;
+    box-shadow:0 4px 18px rgba(79,142,247,.4); transition:transform .15s, box-shadow .25s;
+  }
+  .controls button:hover{transform:translateY(-1px); box-shadow:0 6px 24px rgba(79,142,247,.55)}
+  #status{margin-top:10px; font-size:12px; color:var(--muted)}
+  #status.error{color:#fb7185}
+  .kpis{max-width:1320px; margin:0 auto 16px; display:none; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px}
+  .kpi{
+    background:var(--card); border:1px solid var(--border); border-radius:16px; padding:14px 16px;
+    backdrop-filter:blur(12px); opacity:0; transform:translateY(12px); animation:rise .5s forwards;
+  }
+  .kpi .k{color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.8px}
+  .kpi .v{font-size:24px; font-weight:800; margin-top:2px; font-variant-numeric:tabular-nums}
+  .kpi .d{font-size:11px; color:var(--muted); margin-top:1px}
+  .kpi .d.up{color:var(--green)} .kpi .d.down{color:#fb7185}
+  .grid{max-width:1320px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit,minmax(min(580px,100%),1fr)); gap:16px}
+  .card{
+    background:var(--card); border:1px solid var(--border); border-radius:18px; padding:20px;
+    backdrop-filter:blur(12px); opacity:0; transform:translateY(14px); animation:rise .55s forwards;
+    transition:border-color .3s, box-shadow .3s;
+  }
+  .card:hover{border-color:rgba(255,255,255,.16); box-shadow:0 10px 40px rgba(0,0,0,.35)}
+  .card.wide{grid-column:1 / -1}
+  @keyframes rise{to{opacity:1; transform:none}}
+  .card h2{font-size:15px; font-weight:700; display:flex; align-items:center; gap:8px}
+  .dot{width:9px; height:9px; border-radius:3px; display:inline-block}
+  .card .note{color:var(--muted); font-size:11px; margin:2px 0 14px 17px}
+  .row{display:grid; grid-template-columns:30px minmax(170px,240px) 1fr; gap:10px; align-items:center;
+    padding:5px 0; opacity:0; transform:translateX(-10px); animation:slidein .4s forwards}
+  @keyframes slidein{to{opacity:1; transform:none}}
+  .rk{width:24px; height:24px; border-radius:8px; display:flex; align-items:center; justify-content:center;
+    font-size:11px; font-weight:800; background:rgba(255,255,255,.06); color:var(--muted)}
+  .rk.g{background:linear-gradient(135deg,#fde68a,#f59e0b); color:#3a2a00}
+  .rk.s{background:linear-gradient(135deg,#e5e9f0,#9aa5b8); color:#1d2330}
+  .rk.b{background:linear-gradient(135deg,#f0b48a,#b9743f); color:#341d08}
+  .who{overflow:hidden}
+  .who .nm{font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .who .tm{font-size:11px; color:var(--muted)}
+  .track{background:rgba(255,255,255,.05); border-radius:9px; height:26px; overflow:hidden; position:relative}
+  .fill{
+    height:100%; width:0; border-radius:9px; display:flex; align-items:center; justify-content:flex-end;
+    transition:width 1s cubic-bezier(.22,.8,.3,1); position:relative; min-width:8px;
+  }
+  .fill::after{content:''; position:absolute; inset:0; border-radius:9px;
+    background:linear-gradient(180deg, rgba(255,255,255,.25), rgba(255,255,255,0) 45%)}
+  .fill .val{font-size:12px; font-weight:800; padding:0 9px; color:#0b1020; position:relative; z-index:1;
+    font-variant-numeric:tabular-nums; text-shadow:0 1px 0 rgba(255,255,255,.25)}
+  .val.out{position:absolute; left:calc(var(--w) + 8px); top:50%; transform:translateY(-50%);
+    color:var(--text); text-shadow:none; padding:0; font-size:12px; font-weight:800}
+  table{width:100%; border-collapse:collapse; font-size:13px}
+  th{color:var(--muted); font-size:10.5px; text-transform:uppercase; letter-spacing:.6px; text-align:left;
+    padding:7px 9px; border-bottom:1px solid var(--border); white-space:nowrap}
+  td{padding:8px 9px; border-bottom:1px solid rgba(255,255,255,.05); white-space:nowrap}
+  td.num, th.num{text-align:right; font-variant-numeric:tabular-nums}
+  tbody tr{transition:background .2s}
+  tbody tr:hover{background:rgba(255,255,255,.04)}
+  tr:last-child td{border-bottom:none}
+  .lic{color:var(--muted); font-size:11px}
+  .tablewrap{overflow-x:auto; -webkit-overflow-scrolling:touch}
+  .tablewrap table{min-width:640px}
+  footer{max-width:1320px; margin:18px auto 0; color:var(--muted); font-size:11px}
+  .grid > .card{min-width:0}
+  .kpis > .kpi{min-width:0}
+  @media (max-width:1240px){.grid{grid-template-columns:1fr}}
+  @media (max-width:768px){
+    body{padding:14px 10px}
+    h1{font-size:19px}
+    .sub{font-size:11px}
+    .controls{gap:8px}
+    .controls input[type=text]{min-width:100%; flex-basis:100%}
+    .controls select{flex:1; min-width:0}
+    .controls button{flex:1}
+    .kpis{grid-template-columns:repeat(auto-fit,minmax(105px,1fr)); gap:8px}
+    .kpi{padding:10px 12px; border-radius:12px}
+    .kpi .v{font-size:18px}
+    .kpi .k{font-size:10px}
+    .grid{gap:10px}
+    .card{padding:14px; border-radius:14px}
+    .card h2{font-size:14px}
+    table{font-size:12px}
+    th,td{padding:6px 6px}
+    footer{font-size:10px}
+  }
+  @media (max-width:520px){
+    .row{grid-template-columns:26px 1fr; row-gap:3px}
+    .row .track{grid-column:1 / -1}
+    .who .nm{font-size:12px}
+    .who .tm{display:block}
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title">Dashboard de equipo · n01darts</h1>
+  <div class="sub" id="subtitle">Pega la URL del torneo, pulsa Cargar y elige un equipo.</div>
+  <div class="controls">
+    <input type="text" id="urlInput" placeholder="https://n01darts.com/n01/tournament/t_stats.html?id=t_XXXX_0000  (o solo t_XXXX_0000)">
+    <button id="loadBtn">Cargar</button>
+    <select id="teamSel" style="display:none"></select>
+  </div>
+  <div id="status"></div>
+</header>
+
+<div class="kpis" id="kpis"></div>
+<div class="grid" id="grid" style="display:none">
+  <div class="card wide" style="animation-delay:.05s"><h2><span class="dot" style="background:var(--blue)"></span>Jugadores del equipo</h2><div class="note">Ordenados por media de 3 dardos · estadísticas completas de la temporada</div><div class="tablewrap" id="t-players"></div></div>
+  <div class="card" style="animation-delay:.1s"><h2><span class="dot" style="background:var(--blue)"></span>Media 3 dardos por jugador</h2><div class="note">Todos los dardos de la temporada</div><div id="c-avg3"></div></div>
+  <div class="card" style="animation-delay:.15s"><h2><span class="dot" style="background:var(--green)"></span>% legs ganados por jugador</h2><div class="note">Legs ganados / legs jugados</div><div id="c-legs"></div></div>
+  <div class="card" style="animation-delay:.2s"><h2><span class="dot" style="background:var(--amber)"></span>180s por jugador</h2><div class="note">Maximazos</div><div id="c-180"></div></div>
+  <div class="card" style="animation-delay:.25s"><h2><span class="dot" style="background:var(--cyan)"></span>First 9 por jugador</h2><div class="note">Media de los 9 primeros dardos</div><div id="c-f9"></div></div>
+  <div class="card" style="animation-delay:.3s"><h2><span class="dot" style="background:var(--pink)"></span>Cierre más alto por jugador</h2><div class="note">High finish</div><div id="c-hf"></div></div>
+  <div class="card" style="animation-delay:.35s"><h2><span class="dot" style="background:var(--violet)"></span>Mejor leg por jugador</h2><div class="note">Menos dardos para cerrar un leg (menos es mejor)</div><div id="c-best"></div></div>
+  <div class="card wide" style="animation-delay:.4s"><h2><span class="dot" style="background:var(--pink)"></span>Cierres 100+ del equipo</h2><div class="note">Cronología de high finishes registrados en la competición</div><div class="tablewrap" id="t-hf"></div></div>
+</div>
+<footer>
+  Fuente: API pública de n01darts, consultada en vivo al cargar. Medias: 3D = puntos/dardos×3 · F9 = puntosF9/dardosF9×3.
+</footer>
+
+<script>
+const API = 'https://tk2-228-23746.vs.sakura.ne.jp/n01/tournament/';
+const $ = id => document.getElementById(id);
+const GRADS = {
+  blue:'linear-gradient(90deg,#3b82f6,#60c5fa)', green:'linear-gradient(90deg,#10b981,#5eead4)',
+  amber:'linear-gradient(90deg,#f59e0b,#fde047)', pink:'linear-gradient(90deg,#ec4899,#f9a8d4)',
+  cyan:'linear-gradient(90deg,#06b6d4,#67e8f9)', violet:'linear-gradient(90deg,#8b5cf6,#c4b5fd)'
+};
+let S = null; // estado: {id, meta, entries, teams, players, highOut, schedules}
+
+function parseId(text){ const m = String(text).trim().match(/t_[A-Za-z0-9]+_[0-9]+/); return m ? m[0] : null; }
+async function getJSON(url){ const r = await fetch(url); if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }
+function splitName(oname){
+  const p = String(oname).split(' ');
+  return (p.length > 1 && /^\d+$/.test(p[0])) ? {lic:p[0], name:p.slice(1).join(' ')} : {lic:'', name:oname};
+}
+function avg3(e){ return e.darts ? e.score / e.darts * 3 : 0; }
+function f9(e){ return e.f9Darts ? e.f9Score / e.f9Darts * 3 : 0; }
+function fmt(v, dec){ return Number(v).toLocaleString('es-ES', {minimumFractionDigits:dec, maximumFractionDigits:dec}); }
+function rankClass(i){ return i===0 ? 'rk g' : i===1 ? 'rk s' : i===2 ? 'rk b' : 'rk'; }
+function fecha(ms){ return new Date(ms).toLocaleDateString('es-ES'); }
+
+function bars(containerId, items, grad, dec){
+  const max = Math.max(...items.map(it=>it.value), 1e-9);
+  const el = $(containerId);
+  el.innerHTML = items.map((it,i)=>{
+    const pct = it.w !== undefined ? it.w : Math.max(it.value / max * 100, 2);
+    const inside = pct >= 22;
+    return '<div class="row" style="animation-delay:'+(i*55)+'ms">'+
+      '<span class="'+rankClass(i)+'">'+(i+1)+'</span>'+
+      '<span class="who"><span class="nm">'+it.name+'</span>'+(it.team?'<span class="tm"> · '+it.team+'</span>':'')+'</span>'+
+      '<div class="track"><div class="fill" data-w="'+pct+'" style="background:'+grad+';--w:'+pct+'%">'+
+      (inside ? '<span class="val" data-v="'+it.value+'" data-d="'+dec+'">0</span>' : '')+
+      '</div>'+(!inside ? '<span class="val out" data-v="'+it.value+'" data-d="'+dec+'" style="--w:'+pct+'%">0</span>' : '')+'</div></div>';
+  }).join('');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    el.querySelectorAll('.fill').forEach(f => f.style.width = f.dataset.w + '%');
+    el.querySelectorAll('.val').forEach(v => countUp(v, Number(v.dataset.v), Number(v.dataset.d)));
+  }));
+}
+function countUp(el, target, dec){
+  const t0 = performance.now(), dur = 950;
+  function tick(t){
+    const k = Math.min((t - t0) / dur, 1), eased = 1 - Math.pow(1 - k, 3);
+    el.textContent = fmt(target * eased, dec);
+    if(k < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+function schedules(meta){
+  const map = {};
+  ['lg_setting','rr_setting','t_setting','m_setting'].forEach(k=>{
+    ((meta && meta[k] && meta[k].schedule) || []).forEach(s => { if(!(s.schid in map)) map[s.schid] = (s.subTitle||'').trim(); });
+  });
+  return map;
+}
+
+async function load(){
+  const id = parseId($('urlInput').value);
+  const st = $('status');
+  if(!id){ st.textContent = 'No encuentro un id de torneo valido (formato t_XXXX_0000).'; st.className='error'; return; }
+  st.className=''; st.textContent = 'Cargando datos de ' + id + ' ...';
+  try{
+    const q = '&tdid=' + id;
+    const [meta, entries, teamStats, playerStats, highOut] = await Promise.all([
+      getJSON(API + 'n01_tournament.php?cmd=get_data' + q),
+      getJSON(API + 'n01_tournament.php?cmd=get_entry_list' + q),
+      getJSON(API + 'n01_stats_t.php?cmd=stats_list' + q),
+      getJSON(API + 'n01_stats_t.php?cmd=player_stats_list' + q),
+      getJSON(API + 'n01_stats_t.php?cmd=player_high_out' + q)
+    ]);
+    const teamName = {}; (entries||[]).forEach(e => teamName[e.tpid] = e.name);
+    S = {
+      id, meta,
+      teams: Object.entries(teamStats||{}).map(([tpid,t]) => ({...t, tpid, name: teamName[tpid] || tpid})),
+      players: Object.entries(playerStats||{}).map(([oid,p]) => ({...p, oid})),
+      highOut: highOut || [],
+      sched: schedules(meta)
+    };
+    if(!S.players.length){ st.className='error'; st.textContent='Este torneo no tiene stats por jugador (torneo individual). Usa dashboard.html.'; return; }
+    const sel = $('teamSel');
+    sel.innerHTML = S.teams.sort((a,b)=>a.name.localeCompare(b.name)).map(t=>'<option value="'+t.tpid+'">'+t.name+'</option>').join('');
+    sel.style.display = '';
+    const want = new URLSearchParams(location.search).get('team');
+    if(want && S.teams.some(t=>t.tpid===want)) sel.value = want;
+    st.textContent = (S.meta && S.meta.title ? S.meta.title + ' · ' : '') + 'Datos cargados: ' + new Date().toLocaleString('es-ES');
+    renderTeam(sel.value);
+  }catch(e){
+    st.className='error';
+    st.textContent = 'Error cargando datos: ' + e.message + ' (revisa el id o la conexion)';
+  }
+}
+
+function renderTeam(tpid){
+  const t = S.teams.find(x=>x.tpid===tpid);
+  if(!t) return;
+  const players = S.players.filter(p=>p.tpid===tpid).sort((a,b)=>avg3(b)-avg3(a));
+  history.replaceState(null,'', location.pathname + '?id=' + S.id + '&team=' + tpid);
+
+  $('title').textContent = t.name;
+  $('subtitle').textContent = (S.meta && S.meta.title ? S.meta.title : S.id) + ' · ' + players.length + ' jugadores';
+  $('grid').style.display = '';
+
+  // Posicion en la liga (PG, desempate media 1D) y media global para comparar
+  const rank = [...S.teams].sort((a,b)=> b.winMatch-a.winMatch || (b.score/b.darts)-(a.score/a.darts));
+  const pos = rank.findIndex(x=>x.tpid===tpid) + 1;
+  const ligaAvg = S.teams.reduce((s,x)=>s+x.score,0) / Math.max(S.teams.reduce((s,x)=>s+x.darts,0),1) * 3;
+  const dif = avg3(t) - ligaAvg;
+
+  const box = $('kpis');
+  box.style.display = 'grid';
+  const kpiData = [
+    ['Posición', pos + 'º', 'de ' + S.teams.length, ''],
+    ['Partidos', t.winMatch + ' / ' + t.match, 'ganados / jugados', ''],
+    ['% legs ganados', fmt(t.leg?100*t.winLeg/t.leg:0,1) + '%', 'dif. legs ' + (2*t.winLeg-t.leg>0?'+':'') + (2*t.winLeg-t.leg), ''],
+    ['Media 3D', fmt(avg3(t),2), (dif>=0?'+':'') + fmt(dif,2) + ' vs liga', dif>=0?'up':'down'],
+    ['180s', t.ton80, '100+: ' + t.ton00 + ' · 140+: ' + t.ton40, ''],
+    ['Mejor cierre', t.highOut, t.highOutCount + ' cierres 100+', ''],
+    ['Mejor leg', t.best, 'peor: ' + t.worst + ' dardos', '']
+  ];
+  box.innerHTML = kpiData.map((k,i)=>'<div class="kpi" style="animation-delay:'+(i*70)+'ms"><div class="k">'+k[0]+
+    '</div><div class="v">'+k[1]+'</div><div class="d '+k[3]+'">'+k[2]+'</div></div>').join('');
+
+  // Tabla completa de jugadores
+  $('t-players').innerHTML = '<table><thead><tr><th>#</th><th>Jugador</th><th class="num">PJ</th><th class="num">Sets</th>'+
+    '<th class="num">Legs</th><th class="num">Legs G</th><th class="num">% legs</th><th class="num">100+</th><th class="num">140+</th>'+
+    '<th class="num">180s</th><th class="num">Mejor cierre</th><th class="num">Mejor leg</th><th class="num">Media 3D</th><th class="num">First 9</th></tr></thead><tbody>'+
+    players.map((p,i)=>{
+      const s = splitName(p.oname);
+      return '<tr><td><span class="'+rankClass(i)+'">'+(i+1)+'</span></td>'+
+        '<td><b>'+s.name+'</b>'+(s.lic?' <span class="lic">('+s.lic+')</span>':'')+'</td>'+
+        '<td class="num">'+p.match+'</td><td class="num">'+p.winSet+'/'+p.set+'</td>'+
+        '<td class="num">'+p.leg+'</td><td class="num">'+p.winLeg+'</td>'+
+        '<td class="num">'+fmt(p.leg?100*p.winLeg/p.leg:0,1)+'%</td>'+
+        '<td class="num">'+p.ton00+'</td><td class="num">'+p.ton40+'</td><td class="num"><b>'+p.ton80+'</b></td>'+
+        '<td class="num">'+(p.highOut||'—')+'</td><td class="num">'+(p.best||'—')+'</td>'+
+        '<td class="num"><b>'+fmt(avg3(p),2)+'</b></td><td class="num">'+fmt(f9(p),2)+'</td></tr>';
+    }).join('')+'</tbody></table>';
+
+  const P = p => ({name: splitName(p.oname).name, team:''});
+
+  bars('c-avg3', players.map(p=>({...P(p), value:avg3(p)})), GRADS.blue, 2);
+  bars('c-legs', players.map(p=>({...P(p), value:p.leg?100*p.winLeg/p.leg:0})).sort((a,b)=>b.value-a.value), GRADS.green, 1);
+  bars('c-180', players.filter(p=>p.ton80>0).sort((a,b)=>b.ton80-a.ton80).map(p=>({...P(p), value:p.ton80})), GRADS.amber, 0);
+  bars('c-f9', [...players].sort((a,b)=>f9(b)-f9(a)).map(p=>({...P(p), value:f9(p)})), GRADS.cyan, 2);
+  bars('c-hf', players.filter(p=>p.highOut>0).sort((a,b)=>b.highOut-a.highOut).map(p=>({...P(p), value:p.highOut})), GRADS.pink, 0);
+  const bl = players.filter(p=>p.best>0).sort((a,b)=>a.best-b.best);
+  if(bl.length){
+    const worst = Math.max(...bl.map(p=>p.best));
+    const maxw = Math.max(...bl.map(p=>worst + 4 - p.best));
+    bars('c-best', bl.map(p=>({...P(p), value:p.best, w:Math.max((worst + 4 - p.best)/maxw*100, 24)})), GRADS.violet, 0);
+  } else { $('c-best').innerHTML = '<div class="note">Sin legs ganados todavía.</div>'; }
+
+  // Cierres 100+ del equipo
+  const hf = S.highOut.filter(e=>e.tpid===tpid).sort((a,b)=>b.highOut-a.highOut || a.time-b.time);
+  $('t-hf').innerHTML = hf.length
+    ? '<table><thead><tr><th>#</th><th>Jugador</th><th>Set</th><th class="num">Cierre</th><th class="num">Fecha</th></tr></thead><tbody>'+
+      hf.map((e,i)=>{
+        const s = splitName(e.oname);
+        return '<tr><td><span class="'+rankClass(i)+'">'+(i+1)+'</span></td><td><b>'+s.name+'</b>'+(s.lic?' <span class="lic">('+s.lic+')</span>':'')+'</td>'+
+          '<td>'+(S.sched[e.schid]||e.schid)+'</td><td class="num"><b>'+e.highOut+'</b></td><td class="num">'+fecha(e.time)+'</td></tr>';
+      }).join('')+'</tbody></table>'
+    : '<div class="note">Este equipo no tiene cierres de 100+ registrados (la API devuelve los 100 mejores de la competición).</div>';
+}
+
+$('loadBtn').addEventListener('click', load);
+$('urlInput').addEventListener('keydown', e => { if(e.key === 'Enter') load(); });
+$('teamSel').addEventListener('change', () => renderTeam($('teamSel').value));
+
+const urlId = new URLSearchParams(location.search).get('id');
+if(urlId){ $('urlInput').value = urlId; load(); }
+else { $('urlInput').value = 'https://n01darts.com/n01/tournament/t_stats.html?id=t_bn9O_4432'; }
+</script>
+</body>
+</html>
