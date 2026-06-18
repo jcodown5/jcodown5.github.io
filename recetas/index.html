@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La Carta Setmanal · Menú de 52 semanas con recetas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#211C17;--paper:#FBFAF6;--card:#FFFFFF;
+  --line:rgba(33,28,23,.13);--line-strong:rgba(33,28,23,.28);--muted:#6E665C;
+  --acc:#5C8C3A;--acc-soft:rgba(92,140,58,.12);
+  --display:"Fraunces",Georgia,"Times New Roman",serif;
+  --body:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+[data-season="p"]{--acc:#5C8C3A;--acc-soft:rgba(92,140,58,.12);}
+[data-season="v"]{--acc:#D8492B;--acc-soft:rgba(216,73,43,.11);}
+[data-season="o"]{--acc:#B06A1B;--acc-soft:rgba(176,106,27,.12);}
+[data-season="i"]{--acc:#3A6E8F;--acc-soft:rgba(58,110,143,.12);}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--body);color:var(--ink);background:var(--paper);line-height:1.5;font-size:15px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:0 22px}
+.topbar{display:flex;align-items:baseline;justify-content:space-between;gap:14px;padding:26px 0 18px;border-bottom:1px solid var(--line)}
+.brand{font-family:var(--display);font-weight:600;font-size:21px;letter-spacing:-.01em}
+.brand b{color:var(--acc);font-weight:600}
+.brand-sub{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.topbar-right{font-size:12px;color:var(--muted);text-align:right;flex-shrink:0}
+.hero{display:flex;align-items:flex-end;gap:26px;padding:30px 0 22px;flex-wrap:wrap}
+.weeknum{font-family:var(--display);font-weight:700;font-size:clamp(64px,15vw,150px);line-height:.84;letter-spacing:-.04em;color:var(--acc);font-variant-numeric:lining-nums}
+.hero-meta .eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.hero-meta h1{font-family:var(--display);font-weight:600;font-size:clamp(24px,4vw,38px);line-height:1.05;letter-spacing:-.02em;margin:4px 0 8px}
+.hero-meta .line{font-size:13.5px;color:var(--muted);max-width:46ch}
+.season-dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--acc);margin-right:7px;vertical-align:middle}
+.nav{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:24px}
+button{font-family:var(--body);cursor:pointer}
+.navbtn{border:1px solid var(--line-strong);background:var(--card);color:var(--ink);border-radius:999px;padding:9px 16px;font-size:13.5px;font-weight:500;display:inline-flex;align-items:center;gap:6px;transition:border-color .15s,color .15s}
+.navbtn:hover{border-color:var(--acc);color:var(--acc)}
+.navbtn:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.nav select{font-family:var(--body);font-size:13.5px;border:1px solid var(--line-strong);background:var(--card);border-radius:999px;padding:9px 14px;color:var(--ink)}
+.spacer{flex:1}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:transparent;border-radius:999px;padding:7px 13px;font-size:12px;font-weight:500;color:var(--muted)}
+.chip[aria-current="true"]{background:var(--acc);border-color:var(--acc);color:#fff}
+.chip:hover{border-color:var(--acc)}
+.cols{display:grid;grid-template-columns:1.55fr 1fr;gap:26px;align-items:start}
+.panel-title{font-family:var(--display);font-size:16px;font-weight:600;display:flex;align-items:center;gap:9px;margin-bottom:12px}
+.panel-title::after{content:"";flex:1;height:1px;background:var(--line)}
+.day{display:grid;grid-template-columns:88px 1fr 1fr;border:1px solid var(--line);border-radius:12px;background:var(--card);margin-bottom:9px;overflow:hidden}
+.day-name{padding:14px 12px;font-weight:600;font-size:12.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);background:var(--acc-soft);display:flex;align-items:center}
+.slot{padding:12px 14px;border-left:1px solid var(--line);cursor:pointer;transition:background .12s}
+.slot:hover{background:var(--acc-soft)}
+.slot:focus-visible{outline:2px solid var(--acc);outline-offset:-2px}
+.slot .k{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.slot .dish{font-size:14.5px;font-weight:500;line-height:1.3}
+.methods{margin-top:7px;display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.m{font-size:9.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:5px;border:1px solid var(--line-strong);color:var(--muted)}
+.m.tmx{color:#7a5cff;border-color:rgba(122,92,255,.45)}
+.m.air{color:#d8492b;border-color:rgba(216,73,43,.45)}
+.m.trad{color:#5c8c3a;border-color:rgba(92,140,58,.45)}
+.seerecipe{font-size:11px;color:var(--acc);font-weight:500;margin-top:8px}
+.ticket{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 18px 6px;position:sticky;top:14px}
+.ticket-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.ticket-head h3{font-family:var(--display);font-size:16px;font-weight:600}
+.copybtn{border:1px solid var(--line-strong);background:transparent;border-radius:8px;padding:6px 11px;font-size:12px;font-weight:500;color:var(--ink)}
+.copybtn:hover{border-color:var(--acc);color:var(--acc)}
+.perf{border-top:2px dashed var(--line-strong);margin:10px -18px 12px}
+.cat{margin-bottom:13px}
+.cat h4{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--acc);font-weight:600;margin-bottom:6px}
+.cat ul{list-style:none}
+.cat li{font-size:13px;padding:3px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px}
+.cat li span{color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.pantry-note{font-size:11.5px;color:var(--muted);padding:8px 0 14px;line-height:1.45}
+.foot{border-top:1px solid var(--line);margin-top:34px;padding:20px 0 40px;font-size:12px;color:var(--muted);line-height:1.6}
+.foot b{color:var(--ink);font-weight:600}
+/* modal receta */
+.overlay{position:fixed;inset:0;background:rgba(33,28,23,.5);display:none;align-items:center;justify-content:center;padding:24px;z-index:50}
+.overlay.open{display:flex}
+.modal{background:var(--card);border-radius:16px;max-width:580px;width:100%;max-height:88vh;overflow:auto;padding:28px}
+.modal .mtop{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+.modal .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.modal h2{font-family:var(--display);font-weight:600;font-size:24px;line-height:1.1;letter-spacing:-.02em;margin:5px 0 10px}
+.closebtn{border:1px solid var(--line-strong);background:transparent;border-radius:50%;width:34px;height:34px;font-size:18px;color:var(--ink);flex-shrink:0;line-height:1}
+.closebtn:hover{border-color:var(--acc);color:var(--acc)}
+.modal .mmethods{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap}
+.msec{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--acc);font-weight:600;margin:18px 0 9px}
+.ming{list-style:none}
+.ming li{font-size:13.5px;padding:4px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px}
+.ming li span{color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.msteps{list-style:none;counter-reset:s}
+.msteps li{position:relative;padding:0 0 14px 38px;font-size:14px;line-height:1.55;counter-increment:s}
+.msteps li::before{content:counter(s);position:absolute;left:0;top:-1px;width:26px;height:26px;border-radius:50%;background:var(--acc);color:#fff;font-family:var(--display);font-weight:600;font-size:13px;display:flex;align-items:center;justify-content:center}
+.msteps li:not(:last-child)::after{content:"";position:absolute;left:13px;top:27px;bottom:6px;width:1px;background:var(--line-strong)}
+@media (max-width:820px){
+  .cols{grid-template-columns:1fr}
+  .ticket{position:static}
+  .day{grid-template-columns:70px 1fr}
+  .day-name{grid-row:span 2}
+  .slot{border-left:none;border-top:1px solid var(--line)}
+  .slot:first-of-type{border-top:none}
+  .hero{gap:16px}
+  .topbar-right{display:none}
+}
+@media (max-width:520px){
+  .overlay{padding:0}
+  .modal{border-radius:0;max-height:100vh;height:100vh;padding:22px 20px}
+}
+@media print{
+  .nav,.topbar-right,.copybtn,.foot,.seerecipe,.overlay{display:none!important}
+  body{background:#fff;font-size:12px}
+  .ticket{position:static;border:none;padding:0}
+  .cols{grid-template-columns:1.3fr 1fr;gap:18px}
+  .weeknum{font-size:64px}
+  .day{break-inside:avoid}
+}
+</style>
+</head>
+<body data-season="p">
+<div class="wrap">
+  <header class="topbar">
+    <div>
+      <div class="brand">La Carta <b>Setmanal</b></div>
+      <div class="brand-sub">52 semanas · Thermomix · Airfryer · Tradicional</div>
+    </div>
+    <div class="topbar-right">Comida + cena, L–D<br>4 raciones · cocina mediterránea</div>
+  </header>
+  <section class="hero">
+    <div class="weeknum" id="weeknum">01</div>
+    <div class="hero-meta">
+      <div class="eyebrow"><span class="season-dot"></span><span id="seasonLabel">Primavera</span></div>
+      <h1 id="heroTitle">Semana 1</h1>
+      <p class="line">El menú de la semana y la lista de la compra, ya resueltos. Toca cualquier plato para ver la receta paso a paso.</p>
+    </div>
+  </section>
+  <nav class="nav">
+    <button class="navbtn" id="prev">◀ Anterior</button>
+    <select id="weekSelect" aria-label="Ir a la semana"></select>
+    <button class="navbtn" id="next">Siguiente ▶</button>
+    <span class="spacer"></span>
+    <div class="chips" id="seasonChips">
+      <button class="chip" data-w="1">Primavera</button>
+      <button class="chip" data-w="14">Verano</button>
+      <button class="chip" data-w="27">Otoño</button>
+      <button class="chip" data-w="40">Invierno</button>
+    </div>
+    <button class="navbtn" id="printBtn">Imprimir semana</button>
+  </nav>
+  <div class="cols">
+    <div>
+      <div class="panel-title">Menú de la semana</div>
+      <div id="menu"></div>
+    </div>
+    <aside>
+      <div class="panel-title">Lista de la compra</div>
+      <div class="ticket">
+        <div class="ticket-head"><h3 id="ticketWeek">Semana 1</h3><button class="copybtn" id="copyBtn">Copiar</button></div>
+        <div class="perf"></div>
+        <div id="shopping"></div>
+        <p class="pantry-note">No incluye despensa básica que sueles tener: aceite de oliva, sal, pimienta, vinagre, ajo, harina y especias secas. Revisa antes de salir.</p>
+      </div>
+    </aside>
+  </div>
+  <footer class="foot">
+    <p><b>Cómo se usa.</b> Cada semana combina comida + cena de lunes a domingo. Toca un plato para abrir su receta con ingredientes para 4 y pasos. Las etiquetas <span class="m tmx">TMX</span> Thermomix · <span class="m air">AF</span> Airfryer · <span class="m trad">Trad</span> tradicional indican el método más cómodo; en los pasos verás los tiempos y velocidades de cada uno.</p>
+    <p style="margin-top:8px">Cantidades para 4 raciones generosas. Para perfiles sin gluten, sin lactosa, vegetariano o vegano, o para ampliar el banco de platos, pídemelo y lo adapto.</p>
+  </footer>
+</div>
+
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <div class="modal" id="modal">
+    <div class="mtop">
+      <div>
+        <div class="eyebrow" id="mKind">Comida</div>
+        <h2 id="mTitle">—</h2>
+      </div>
+      <button class="closebtn" id="closeBtn" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="mmethods" id="mMethods"></div>
+    <div class="msec">Ingredientes · 4 raciones</div>
+    <ul class="ming" id="mIng"></ul>
+    <div class="msec">Elaboración</div>
+    <ol class="msteps" id="mSteps"></ol>
+  </div>
+</div>
+
+<script>
+/* ===== BANCO DE PLATOS =====
+ role: comida|cena · m: t=tradicional x=thermomix a=airfryer
+ cat: categoría · s: p/v/o/i estaciones
+ ing: [nombre,cantidad,unidad,grupoCompra] · r: pasos de elaboración */
+const D = [
+/* ---- COMIDAS ---- */
+{n:"Lentejas estofadas con verduras",role:"comida",m:["t","x"],cat:"legumbre",s:["p","o","i"],ing:[["Lentejas pardinas",400,"g","desp"],["Zanahoria",2,"ud","verd"],["Cebolla",1,"ud","verd"],["Pimiento rojo",1,"ud","verd"],["Patata",2,"ud","verd"],["Chorizo (opcional)",100,"g","carne"]],r:["Pica cebolla, pimiento y zanahoria y sofríe en AOVE 8 min a fuego medio (TMX: trocea 5 s/vel 5 y sofríe 5 min/120°/vel cuchara).","Fuera del fuego añade una cucharadita de pimentón y remueve rápido para que no se queme.","Incorpora las lentejas, la patata en cascos, el laurel y el chorizo; cubre con agua dos dedos por encima.","Cuece 35-40 min a fuego suave (TMX: 30 min/100°/giro izq/vel cuchara) hasta que estén tiernas.","Reposa 10 min y corrige de sal. Mejoran de un día para otro."]},
+{n:"Garbanzos con espinacas",role:"comida",m:["t","x"],cat:"legumbre",s:["p","o","i"],ing:[["Garbanzos cocidos",600,"g","desp"],["Espinacas frescas",300,"g","verd"],["Pan del día anterior",2,"reb","pan"],["Huevo",2,"ud","huevo"]],r:["Fríe en AOVE 2 ajos y el pan hasta dorar; retira y maja en mortero con un poco de agua y pimentón.","En esa grasa rehoga las espinacas hasta que pierdan el agua.","Añade los garbanzos escurridos y el majado; cuece 10 min para que ligue.","Casca los huevos encima, tapa y deja cuajar 4-5 min. Sal al gusto."]},
+{n:"Escudella catalana",role:"comida",m:["t"],cat:"legumbre",s:["i"],ing:[["Garbanzos",400,"g","desp"],["Fideos gruesos",150,"g","desp"],["Muslo de pollo",4,"ud","carne"],["Hueso de jamón",1,"ud","carne"],["Patata",2,"ud","verd"],["Zanahoria",2,"ud","verd"],["Col",0.25,"ud","verd"]],r:["Pon a hervir agua abundante con los garbanzos (remojados la víspera), el pollo y el hueso de jamón; retira la espuma.","Añade patata, zanahoria y col; cuece 1 h 15 a fuego suave.","Cuela el caldo y hierve en él los fideos 8-10 min.","Sirve primero la sopa de fideos y, después, la carne y verduras como 'carn d'olla'."]},
+{n:"Potaje de judías blancas con acelgas",role:"comida",m:["t","x"],cat:"legumbre",s:["o","i"],ing:[["Judías blancas",400,"g","desp"],["Acelgas",300,"g","verd"],["Zanahoria",2,"ud","verd"],["Cebolla",1,"ud","verd"]],r:["Sofríe cebolla y zanahoria picadas; añade una cucharadita de pimentón fuera del fuego.","Incorpora las judías (remojadas), las acelgas troceadas y cubre con agua.","Cuece 45 min a fuego suave (olla rápida 18 min). 'Asusta' con un chorro de agua fría a media cocción para que no se rompan.","Sal solo al final."]},
+{n:"Garbanzos con bacalao y espinacas",role:"comida",m:["t"],cat:"legumbre",s:["p","i"],ing:[["Garbanzos cocidos",400,"g","desp"],["Bacalao desalado",300,"g","pesc"],["Espinacas",200,"g","verd"]],r:["Rehoga 2 ajos laminados con una cucharadita de pimentón; añade las espinacas.","Suma los garbanzos y el bacalao desmigado; cubre apenas con agua.","Cuece 15 min suave moviendo la cazuela en vaivén para ligar la salsa."]},
+{n:"Arroz caldoso de marisco",role:"comida",m:["t","x"],cat:"arroz",s:["p","v","o","i"],ing:[["Arroz redondo",320,"g","desp"],["Sepia",300,"g","pesc"],["Gambas",200,"g","pesc"],["Tomate",2,"ud","verd"],["Azafrán",1,"sobre","desp"]],r:["Sofríe ajo y el tomate rallado; añade la sepia troceada y rehoga 5 min.","Echa el arroz, nácalo 2 min, añade el fumet caliente (3 partes por 1 de arroz) y el azafrán.","Cuece 16-18 min; en los últimos 3 min añade las gambas. Debe quedar meloso y caldoso, no seco."]},
+{n:"Paella de pollo y verduras",role:"comida",m:["t"],cat:"arroz",s:["p","v"],ing:[["Arroz redondo",320,"g","desp"],["Pollo troceado",500,"g","carne"],["Judía verde",150,"g","verd"],["Tomate",2,"ud","verd"],["Pimiento rojo",1,"ud","verd"],["Azafrán",1,"sobre","desp"]],r:["Dora el pollo salpimentado en la paella y resérvalo en el borde.","Sofríe judía verde, pimiento y tomate rallado; añade pimentón.","Echa el arroz, nácalo, vierte el caldo caliente (2,5 partes) con azafrán y reparte el pollo.","10 min a fuego fuerte + 8 min suave sin remover. Reposa 5 min tapado con un paño."]},
+{n:"Arroz al horno",role:"comida",m:["t"],cat:"arroz",s:["o","i"],ing:[["Arroz redondo",320,"g","desp"],["Costilla de cerdo",400,"g","carne"],["Garbanzos cocidos",100,"g","desp"],["Tomate",2,"ud","verd"],["Patata",1,"ud","verd"],["Morcilla",1,"ud","carne"]],r:["En cazuela de barro sofríe la costilla troceada, el tomate y los garbanzos.","Añade el arroz, rehoga y vierte agua caliente (doble volumen que el arroz).","Coloca encima la patata en rodajas y la morcilla.","Horno a 220° 18-20 min hasta que el arroz quede seco y suelto."]},
+{n:"Risotto de setas (Thermomix)",role:"comida",m:["x"],cat:"arroz",s:["o","i"],ing:[["Arroz arborio",320,"g","desp"],["Setas variadas",300,"g","verd"],["Cebolla",1,"ud","verd"],["Parmesano",60,"g","lact"],["Vino blanco",100,"ml","desp"]],r:["Trocea la cebolla 4 s/vel 5 y sofríe 5 min/120°/vel cuchara.","Añade las setas: 5 min/120°/giro izq/vel cuchara.","Suma arroz y vino: 2 min/100°/giro izq/vel cuchara.","Añade el caldo caliente: 16 min/100°/giro izq/vel cuchara.","Fuera, mantecar con el parmesano. Reposa 2 min antes de servir."]},
+{n:"Fideuà de marisco",role:"comida",m:["t"],cat:"pasta",s:["p","v","o","i"],ing:[["Fideo fino nº2",320,"g","desp"],["Sepia",300,"g","pesc"],["Gambas",200,"g","pesc"],["Tomate",2,"ud","verd"]],r:["Sofríe ajo, tomate rallado y la sepia; añade pimentón.","Echa el fideo y nácalo 2 min removiendo.","Vierte fumet caliente justo para cubrir y cuece 8-10 min hasta absorberlo.","Acaba 3 min al horno fuerte para que los fideos 'espiguen'. Sirve con alioli."]},
+{n:"Espaguetis a la boloñesa",role:"comida",m:["t","x"],cat:"pasta",s:["p","v","o","i"],ing:[["Espaguetis",350,"g","desp"],["Carne picada mixta",400,"g","carne"],["Tomate triturado",400,"g","desp"],["Cebolla",1,"ud","verd"],["Zanahoria",1,"ud","verd"]],r:["Sofríe cebolla y zanahoria muy picadas; añade la carne y dórala bien (TMX: verdura 5 s/vel 5, sofríe 7 min/120°; carne 8 min/100°/giro izq).","Sube el fuego, añade un chorro de vino y deja evaporar.","Incorpora el tomate y cuece 25-30 min a fuego lento (TMX: 25 min/100°/giro izq). Sal y una pizca de azúcar.","Hierve la pasta al dente y mézclala con la salsa."]},
+{n:"Macarrones gratinados con atún",role:"comida",m:["t","x"],cat:"pasta",s:["p","v","o","i"],ing:[["Macarrones",350,"g","desp"],["Tomate triturado",400,"g","desp"],["Atún en lata",2,"lata","desp"],["Queso rallado",150,"g","lact"]],r:["Prepara un tomate frito con cebolla; añade el atún escurrido.","Hierve los macarrones al dente y mézclalos con la salsa.","Pasa a una fuente, cubre con queso y gratina 8 min a 200° (o airfryer 180° 6 min)."]},
+{n:"Canelones de carne",role:"comida",m:["t"],cat:"pasta",s:["o","i"],ing:[["Placas de canelón",16,"ud","desp"],["Carne picada mixta",400,"g","carne"],["Leche",500,"ml","lact"],["Mantequilla",40,"g","lact"],["Queso rallado",100,"g","lact"]],r:["Sofríe cebolla y cocina la carne; tritúrala fina con un poco de tomate.","Hierve las placas, escúrrelas sobre un paño, rellena y enrolla.","Bechamel (TMX: 40 g harina + 40 g mantequilla + 500 ml leche, 8 min/90°/vel 4).","Napa los canelones con bechamel, cubre de queso y gratina 10 min."]},
+{n:"Lasaña de verduras",role:"comida",m:["t"],cat:"pasta",s:["p","v","o","i"],ing:[["Placas de lasaña",12,"ud","desp"],["Calabacín",1,"ud","verd"],["Berenjena",1,"ud","verd"],["Tomate triturado",400,"g","desp"],["Leche",400,"ml","lact"],["Queso rallado",120,"g","lact"]],r:["Saltea calabacín y berenjena en dados; añade el tomate y cuece 15 min.","Monta capas alternando placa, verdura y bechamel.","Termina con bechamel y queso; horno a 190° 30 min."]},
+{n:"Estofado de ternera con patatas",role:"comida",m:["t","x"],cat:"carne",s:["o","i"],ing:[["Ternera para guisar",600,"g","carne"],["Patata",3,"ud","verd"],["Zanahoria",2,"ud","verd"],["Cebolla",1,"ud","verd"],["Vino tinto",150,"ml","desp"]],r:["Enharina y sella la carne en AOVE a fuego fuerte; resérvala.","Sofríe cebolla y zanahoria; añade el vino y deja evaporar.","Reincorpora la carne, cubre con caldo y cuece 1 h 30 (olla rápida 30 min).","Añade las patatas en cascos 15 min antes del final."]},
+{n:"Pollo al chilindrón",role:"comida",m:["t","x"],cat:"carne",s:["p","v","o","i"],ing:[["Pollo troceado",1,"ud","carne"],["Pimiento rojo",2,"ud","verd"],["Tomate",3,"ud","verd"],["Cebolla",1,"ud","verd"]],r:["Salpimienta y dora el pollo; resérvalo.","Sofríe cebolla, pimiento y tomate 15 min hasta una salsa espesa.","Reincorpora el pollo y cuece 30 min tapado a fuego suave."]},
+{n:"Albóndigas en salsa con guisantes",role:"comida",m:["t","x"],cat:"carne",s:["p","v","o","i"],ing:[["Carne picada mixta",500,"g","carne"],["Huevo",1,"ud","huevo"],["Pan rallado",50,"g","desp"],["Tomate triturado",400,"g","desp"],["Guisantes",100,"g","cong"],["Cebolla",1,"ud","verd"]],r:["Mezcla carne, huevo, pan rallado, ajo y perejil; forma bolas y dóralas.","Sofríe cebolla, añade el tomate y un poco de caldo; tritura la salsa.","Cuece las albóndigas en la salsa 20 min con los guisantes."]},
+{n:"Fricandó con setas",role:"comida",m:["t"],cat:"carne",s:["o","i"],ing:[["Filetes de ternera",600,"g","carne"],["Setas secas (moixernons)",30,"g","desp"],["Cebolla",2,"ud","verd"],["Tomate",2,"ud","verd"]],r:["Hidrata las setas en agua tibia. Enharina y dora los filetes; resérvalos.","Sofríe cebolla y tomate; añade una cucharada de harina, el caldo de las setas y las setas.","Reincorpora la carne y cuece 45 min suave hasta que la salsa ligue."]},
+{n:"Pollo asado con patatas",role:"comida",m:["t"],cat:"carne",s:["p","v","o","i"],ing:[["Pollo entero",1,"ud","carne"],["Patata",4,"ud","verd"],["Limón",1,"ud","fruta"],["Romero",1,"rama","verd"]],r:["Embadurna el pollo con ajo majado, zumo de limón, romero, AOVE y sal.","Colócalo sobre una cama de patatas en rodajas.","Horno a 200° 60-75 min regándolo con sus jugos hasta que la piel esté dorada."]},
+{n:"Muslos de pollo a la airfryer con verduras",role:"comida",m:["a"],cat:"carne",s:["p","v","o","i"],ing:[["Muslos de pollo",8,"ud","carne"],["Patata",3,"ud","verd"],["Calabacín",1,"ud","verd"],["Pimiento",1,"ud","verd"]],r:["Adoba los muslos con especias, ajo y AOVE.","Airfryer 200° 25-28 min, dándoles la vuelta a media cocción.","Añade las patatas y verduras troceadas a los 12 min para que se hagan a la vez."]},
+{n:"Costillas BBQ a la airfryer",role:"comida",m:["a"],cat:"carne",s:["p","v"],ing:[["Costilla de cerdo",1000,"g","carne"],["Salsa barbacoa",1,"bote","desp"],["Patata",3,"ud","verd"]],r:["Salpimienta las costillas y pinta una primera capa de salsa BBQ.","Airfryer 180° 25 min; gira y pinta más salsa.","Sube a 200° 5 min para caramelizar. Patatas en bastones aparte, 180° 18 min."]},
+{n:"Lomo de cerdo a la mostaza",role:"comida",m:["t","x"],cat:"carne",s:["p","v","o","i"],ing:[["Lomo de cerdo",600,"g","carne"],["Cebolla",1,"ud","verd"],["Nata para cocinar",100,"ml","lact"],["Mostaza",1,"cda","desp"]],r:["Dora el lomo entero por todas sus caras; resérvalo.","Pocha la cebolla, añade la mostaza, la nata y un poco de caldo; reduce 5 min.","Lonchea el lomo y cuécelo 10 min en la salsa."]},
+{n:"Hamburguesas caseras con boniato airfryer",role:"comida",m:["a","t"],cat:"carne",s:["p","v","o","i"],ing:[["Carne picada de ternera",500,"g","carne"],["Pan de hamburguesa",4,"ud","pan"],["Boniato",2,"ud","verd"],["Queso en lonchas",4,"ud","lact"],["Lechuga",0.5,"ud","verd"],["Tomate",2,"ud","verd"]],r:["Sazona la carne solo con sal y forma 4 hamburguesas; no las manipules en exceso.","Boniato en bastones a la airfryer 200° 18 min agitando a mitad.","Marca las hamburguesas a la plancha 3 min por lado y funde el queso encima.","Monta con pan, lechuga y tomate."]},
+{n:"Merluza en salsa verde",role:"comida",m:["t"],cat:"pescado",s:["p","v","o","i"],ing:[["Rodajas de merluza",4,"ud","pesc"],["Almejas",200,"g","pesc"],["Guisantes",100,"g","cong"],["Perejil",1,"manojo","verd"]],r:["Sofríe ajo picado en AOVE; añade una cucharadita de harina y el caldo, removiendo.","Coloca la merluza, las almejas y los guisantes.","Cuece 8 min moviendo la cazuela en vaivén para ligar la salsa. Perejil al final."]},
+{n:"Bacalao a la llauna",role:"comida",m:["t"],cat:"pescado",s:["p","i"],ing:[["Lomos de bacalao",4,"ud","pesc"],["Patata",3,"ud","verd"],["Pimentón dulce",1,"cdta","desp"]],r:["Enharina y fríe ligeramente los lomos; ponlos en una bandeja sobre patatas en rodajas.","Sofríe mucho ajo, añade pimentón fuera del fuego y un chorro de vino blanco.","Vierte el sofrito sobre el bacalao y hornea 10 min a 200°."]},
+{n:"Salmón a la airfryer con espárragos",role:"comida",m:["a"],cat:"pescado",s:["p","v","o","i"],ing:[["Lomos de salmón",4,"ud","pesc"],["Espárragos verdes",2,"manojo","verd"],["Limón",1,"ud","fruta"]],r:["Salpimienta el salmón y añade unas gotas de limón y eneldo.","Coloca los espárragos al lado con un hilo de AOVE.","Airfryer 180° 9-11 min según grosor del lomo."]},
+{n:"Dorada al horno con patata panadera",role:"comida",m:["t"],cat:"pescado",s:["p","v","o","i"],ing:[["Dorada",2,"ud","pesc"],["Patata",3,"ud","verd"],["Cebolla",1,"ud","verd"],["Limón",1,"ud","fruta"]],r:["Hornea una cama de patata y cebolla en rodajas 15 min a 200°.","Coloca encima las doradas limpias con limón y AOVE.","Hornea 20 min más hasta que la espina se separe con facilidad."]},
+{n:"Sepia con guisantes",role:"comida",m:["t","x"],cat:"pescado",s:["p","v","o","i"],ing:[["Sepia",600,"g","pesc"],["Guisantes",200,"g","cong"],["Cebolla",1,"ud","verd"],["Tomate",2,"ud","verd"]],r:["Sofríe cebolla y tomate; añade la sepia troceada.","Cuece 25 min a fuego suave con un poco de agua.","Añade los guisantes 10 min antes del final y una picada de ajo y perejil."]},
+{n:"Marmitako de bonito",role:"comida",m:["t","x"],cat:"pescado",s:["v"],ing:[["Bonito",500,"g","pesc"],["Patata",4,"ud","verd"],["Pimiento verde",1,"ud","verd"],["Cebolla",1,"ud","verd"],["Pimiento choricero",2,"ud","desp"]],r:["Sofríe cebolla y pimiento; añade la pulpa de choricero.","'Casca' las patatas (rómpelas con el cuchillo), rehoga y cubre con caldo; cuece 20 min.","Apaga el fuego, añade el bonito en dados, tapa 5 min: el calor residual lo cuaja jugoso."]},
+{n:"Calamares encebollados",role:"comida",m:["t"],cat:"pescado",s:["p","v"],ing:[["Calamar",600,"g","pesc"],["Cebolla",2,"ud","verd"],["Vino blanco",100,"ml","desp"]],r:["Pocha 2 cebollas en juliana muy despacio 25 min hasta que estén melosas.","Añade los calamares en aros, sube el fuego y vierte el vino blanco.","Cuece 10 min hasta que el calamar esté tierno."]},
+{n:"Pisto con huevo",role:"comida",m:["t","x"],cat:"verdura",s:["v","o"],ing:[["Calabacín",2,"ud","verd"],["Berenjena",1,"ud","verd"],["Pimiento",2,"ud","verd"],["Tomate",4,"ud","verd"],["Cebolla",1,"ud","verd"],["Huevo",4,"ud","huevo"]],r:["Sofríe cebolla y pimiento; añade calabacín y berenjena en dados.","Incorpora el tomate y cuece 30 min a fuego lento hasta que reduzca.","Haz huecos, casca los huevos, tapa y deja cuajar al gusto."]},
+{n:"Berenjenas rellenas de carne",role:"comida",m:["t","a"],cat:"verdura",s:["v","o"],ing:[["Berenjena",2,"ud","verd"],["Carne picada",250,"g","carne"],["Tomate triturado",200,"g","desp"],["Queso rallado",80,"g","lact"],["Cebolla",1,"ud","verd"]],r:["Hornea las berenjenas partidas a lo largo 20 min y vacía la pulpa.","Sofríe cebolla, carne y la pulpa picada con el tomate.","Rellena, cubre de queso y gratina 10 min (airfryer 180° 8 min)."]},
+{n:"Coliflor gratinada",role:"comida",m:["t","a"],cat:"verdura",s:["o","i"],ing:[["Coliflor",1,"ud","verd"],["Leche",400,"ml","lact"],["Queso rallado",100,"g","lact"]],r:["Hierve la coliflor en ramilletes 12 min; escúrrela bien.","Cúbrela con una bechamel ligera y el queso.","Gratina 10 min al horno o 8 min en airfryer a 180°."]},
+{n:"Curry de pollo con arroz basmati",role:"comida",m:["t","x"],cat:"carne",s:["p","v","o","i"],ing:[["Pechuga de pollo",500,"g","carne"],["Leche de coco",400,"ml","desp"],["Arroz basmati",300,"g","desp"],["Pimiento",1,"ud","verd"],["Cebolla",1,"ud","verd"],["Pasta de curry",2,"cda","desp"]],r:["Dora el pollo en dados; resérvalo.","Sofríe cebolla y pimiento, añade la pasta de curry y la leche de coco.","Reincorpora el pollo y cuece 15 min. Sirve con basmati hervido 12 min."]},
+{n:"Wok de ternera y verduras con noodles",role:"comida",m:["t"],cat:"carne",s:["p","v","o","i"],ing:[["Ternera en tiras",400,"g","carne"],["Brócoli",1,"ud","verd"],["Zanahoria",2,"ud","verd"],["Pimiento",1,"ud","verd"],["Noodles",250,"g","desp"],["Salsa de soja",4,"cda","desp"]],r:["Marca la ternera a fuego muy fuerte 2 min; resérvala.","Saltea brócoli, zanahoria y pimiento dejándolos crujientes.","Reincorpora la carne, la soja y los noodles ya hervidos; saltea 2 min más."]},
+{n:"Empanada de atún",role:"comida",m:["t"],cat:"pescado",s:["p","v","o","i"],ing:[["Masa de empanada",2,"ud","desp"],["Atún en lata",3,"lata","desp"],["Tomate frito",200,"g","desp"],["Pimiento",1,"ud","verd"],["Cebolla",1,"ud","verd"],["Huevo",2,"ud","huevo"]],r:["Sofríe cebolla y pimiento; añade el tomate frito y el atún (el clásico 'sofrito de empanada').","Extiende una masa, reparte el relleno frío y cubre con la otra; sella los bordes.","Pincela con huevo batido y hornea 30-35 min a 190°."]},
+{n:"Sopa de pescado con fideos",role:"comida",m:["t","x"],cat:"sopa",s:["o","i"],ing:[["Pescado de roca",500,"g","pesc"],["Fideo fino",100,"g","desp"],["Tomate",2,"ud","verd"]],r:["Haz un fumet hirviendo el pescado de roca 20 min y cuélalo.","Sofríe ajo y tomate; añade el fumet.","Cuando hierva, añade los fideos y cuece 10 min."]},
+{n:"Espinacas a la catalana con garbanzos",role:"comida",m:["t"],cat:"verdura",s:["o","i"],ing:[["Espinacas",500,"g","verd"],["Garbanzos cocidos",300,"g","desp"],["Piñones",30,"g","desp"],["Pasas",30,"g","desp"]],r:["Saltea en AOVE el ajo, los piñones y las pasas (estas, remojadas).","Añade las espinacas y deja que pierdan el agua.","Incorpora los garbanzos y saltea 8 min. Sal al gusto."]},
+{n:"Calabacines rellenos de arroz",role:"comida",m:["t","a"],cat:"verdura",s:["v"],ing:[["Calabacín",4,"ud","verd"],["Arroz",150,"g","desp"],["Tomate",2,"ud","verd"],["Queso rallado",60,"g","lact"]],r:["Vacía los calabacines y hornéalos 15 min.","Sofríe la pulpa picada con tomate y mézclala con el arroz ya cocido.","Rellena, cubre con queso y gratina 10 min."]},
+{n:"Tortilla de patatas con ensalada",role:"comida",m:["t"],cat:"huevo",s:["p","v","o","i"],ing:[["Patata",4,"ud","verd"],["Huevo",6,"ud","huevo"],["Cebolla",1,"ud","verd"],["Lechuga",0.5,"ud","verd"],["Tomate",2,"ud","verd"]],r:["Fríe la patata y la cebolla en láminas a fuego lento 20 min; escurre el aceite.","Mézclalas con los huevos batidos y sal; deja reposar 5 min.","Cuaja en la sartén 3 min por lado, dándole la vuelta con un plato. Sirve con la ensalada."]},
+/* ---- CENAS ---- */
+{n:"Crema de puerro y patata",role:"cena",m:["x"],cat:"sopa",s:["o","i"],ing:[["Puerro",3,"ud","verd"],["Patata",2,"ud","verd"],["Cebolla",1,"ud","verd"]],r:["Trocea puerro, patata y cebolla 5 s/vel 5.","Sofríe 6 min/120°/vel cuchara.","Añade agua o caldo hasta cubrir y cuece 20 min/100°/vel 3.","Tritura subiendo de vel 5 a 10 durante 1 min."]},
+{n:"Crema de calabacín",role:"cena",m:["x"],cat:"sopa",s:["p","v","o","i"],ing:[["Calabacín",3,"ud","verd"],["Cebolla",1,"ud","verd"],["Quesitos",2,"ud","lact"],["Patata",1,"ud","verd"]],r:["Trocea calabacín, cebolla y patata 5 s/vel 5 y sofríe 6 min/120°/vel cuchara.","Cubre con caldo y cuece 18 min/100°/vel 2.","Añade los quesitos y tritura 1 min/vel 5-10."]},
+{n:"Crema de calabaza",role:"cena",m:["x"],cat:"sopa",s:["o","i"],ing:[["Calabaza",800,"g","verd"],["Zanahoria",2,"ud","verd"],["Cebolla",1,"ud","verd"],["Patata",1,"ud","verd"]],r:["Trocea todo 5 s/vel 5 y sofríe 6 min/120°/vel cuchara.","Cubre con caldo y cuece 25 min/100°/vel 2.","Tritura 1 min/vel 5-10 hasta que quede sedosa."]},
+{n:"Crema de zanahoria y jengibre",role:"cena",m:["x"],cat:"sopa",s:["o","i"],ing:[["Zanahoria",6,"ud","verd"],["Cebolla",1,"ud","verd"],["Jengibre",1,"trozo","verd"]],r:["Trocea zanahoria, cebolla y un trozo de jengibre 6 s/vel 5.","Sofríe 6 min/120°/vel cuchara.","Cubre con caldo, cuece 22 min/100°/vel 2 y tritura 1 min/vel 5-10."]},
+{n:"Crema de guisantes y menta",role:"cena",m:["x"],cat:"sopa",s:["p"],ing:[["Guisantes",500,"g","cong"],["Cebolla",1,"ud","verd"],["Menta",1,"manojo","verd"]],r:["Pocha la cebolla 6 min/120°/vel cuchara.","Añade los guisantes y caldo; cuece 12 min/100°/vel 2.","Tritura con unas hojas de menta 1 min/vel 5-10."]},
+{n:"Vichyssoise fría de puerro",role:"cena",m:["x"],cat:"sopa",s:["v"],ing:[["Puerro",3,"ud","verd"],["Patata",2,"ud","verd"],["Nata para cocinar",100,"ml","lact"]],r:["Cuece puerro y patata con caldo 20 min/100°/vel 2.","Añade la nata y tritura 1 min/vel 5-10.","Enfría en la nevera al menos 2 h; sírvela bien fría."]},
+{n:"Sopa juliana de verduras",role:"cena",m:["t","x"],cat:"sopa",s:["o","i"],ing:[["Verduras variadas",500,"g","verd"],["Caldo de verduras",1,"l","desp"]],r:["Corta las verduras en juliana fina.","Hiérvelas en el caldo 20 min hasta que estén tiernas pero enteras.","Rectifica de sal y sirve caliente."]},
+{n:"Minestrone",role:"cena",m:["t","x"],cat:"sopa",s:["o","i"],ing:[["Judía verde",150,"g","verd"],["Zanahoria",2,"ud","verd"],["Apio",2,"rama","verd"],["Tomate triturado",200,"g","desp"],["Pasta sopa",80,"g","desp"],["Alubia blanca",100,"g","desp"]],r:["Sofríe las verduras en dados; añade el tomate.","Cubre con caldo y cuece 15 min con la alubia.","Añade la pasta y cuece 8 min más. Sirve con parmesano."]},
+{n:"Gazpacho andaluz",role:"cena",m:["x"],cat:"sopa",s:["v"],ing:[["Tomate maduro",1000,"g","verd"],["Pepino",1,"ud","verd"],["Pimiento verde",1,"ud","verd"],["Pan",80,"g","pan"]],r:["Tritura tomate, pepino, pimiento, ajo y el pan remojado 1 min/vel 10.","Con la máquina en marcha emulsiona con AOVE y vinagre.","Cuela si lo quieres fino y enfría 2 h."]},
+{n:"Salmorejo con jamón y huevo",role:"cena",m:["x"],cat:"sopa",s:["v"],ing:[["Tomate maduro",1000,"g","verd"],["Pan",200,"g","pan"],["Jamón serrano",100,"g","carne"],["Huevo",2,"ud","huevo"]],r:["Tritura tomate, pan, ajo y sal 1 min/vel 10.","Emulsiona con AOVE en hilo hasta que quede cremoso y anaranjado.","Sirve frío con huevo duro picado y jamón."]},
+{n:"Ensalada César con pollo",role:"cena",m:["t","a"],cat:"ensalada",s:["p","v","o","i"],ing:[["Lechuga romana",1,"ud","verd"],["Pechuga de pollo",300,"g","carne"],["Pan",4,"reb","pan"],["Parmesano",50,"g","lact"]],r:["Haz el pollo a la plancha o airfryer (190° 12 min) y trocéalo.","Tuesta el pan en dados para los picatostes.","Mezcla la lechuga con la salsa césar, el pollo, los picatostes y parmesano."]},
+{n:"Ensalada de garbanzos",role:"cena",m:["t"],cat:"ensalada",s:["p","v"],ing:[["Garbanzos cocidos",400,"g","desp"],["Tomate",2,"ud","verd"],["Pepino",1,"ud","verd"],["Atún en lata",1,"lata","desp"]],r:["Escurre y enjuaga los garbanzos.","Mézclalos con tomate, pepino y cebolleta en dados y el atún.","Aliña con AOVE, vinagre y sal."]},
+{n:"Ensalada de pasta fría",role:"cena",m:["t"],cat:"ensalada",s:["v"],ing:[["Pasta corta",250,"g","desp"],["Atún en lata",2,"lata","desp"],["Tomate cherry",250,"g","verd"],["Maíz",1,"lata","desp"],["Huevo",2,"ud","huevo"]],r:["Hierve la pasta, escúrrela y enfríala bajo el grifo.","Mézclala con atún, cherry partidos, maíz y huevo duro.","Aliña con AOVE y orégano; mejor reposada en nevera."]},
+{n:"Ensalada caprese",role:"cena",m:["t"],cat:"ensalada",s:["v"],ing:[["Tomate",4,"ud","verd"],["Mozzarella",250,"g","lact"],["Albahaca",1,"manojo","verd"]],r:["Corta tomate y mozzarella en rodajas y alterna en el plato.","Reparte hojas de albahaca.","Aliña con AOVE, sal y, si quieres, una reducción de balsámico."]},
+{n:"Tortilla francesa con calabacín",role:"cena",m:["t"],cat:"huevo",s:["p","v","o","i"],ing:[["Huevo",6,"ud","huevo"],["Calabacín",1,"ud","verd"]],r:["Saltea el calabacín en dados hasta dorar.","Bate los huevos con sal, añade el calabacín.","Cuaja en sartén jugosa, doblándola por la mitad."]},
+{n:"Tortilla de espinacas",role:"cena",m:["t"],cat:"huevo",s:["o","i"],ing:[["Huevo",6,"ud","huevo"],["Espinacas",200,"g","verd"]],r:["Saltea las espinacas con ajo hasta que pierdan el agua.","Bátelas con los huevos y sal.","Cuaja en la sartén 3 min por lado."]},
+{n:"Revuelto de setas y gambas",role:"cena",m:["t"],cat:"huevo",s:["o","i"],ing:[["Huevo",6,"ud","huevo"],["Setas",200,"g","verd"],["Gambas",150,"g","pesc"]],r:["Saltea las setas y las gambas con ajo a fuego fuerte.","Baja el fuego, añade los huevos batidos.","Remueve sin parar hasta un revuelto cremoso, aún jugoso."]},
+{n:"Huevos rotos con jamón (airfryer)",role:"cena",m:["a","t"],cat:"huevo",s:["p","v","o","i"],ing:[["Patata",4,"ud","verd"],["Huevo",4,"ud","huevo"],["Jamón serrano",100,"g","carne"]],r:["Patatas en gajos a la airfryer 200° 18 min agitando a mitad.","Fríe los huevos en abundante AOVE caliente, dejando la yema líquida.","Rompe los huevos sobre las patatas y reparte el jamón por encima."]},
+{n:"Quiche de verduras",role:"cena",m:["t"],cat:"huevo",s:["p","v","o","i"],ing:[["Masa quebrada",1,"ud","desp"],["Huevo",4,"ud","huevo"],["Nata para cocinar",200,"ml","lact"],["Espinacas",150,"g","verd"],["Queso rallado",80,"g","lact"]],r:["Forra un molde con la masa y pínchala con un tenedor.","Saltea las espinacas. Bate huevos, nata, queso y sal.","Mezcla todo, vierte sobre la masa y hornea 35 min a 180°."]},
+{n:"Pescado blanco a la plancha con verduritas",role:"cena",m:["t","a"],cat:"pescado",s:["p","v","o","i"],ing:[["Lenguado o panga",4,"ud","pesc"],["Calabacín",1,"ud","verd"],["Zanahoria",2,"ud","verd"],["Limón",1,"ud","fruta"]],r:["Saltea calabacín y zanahoria en juliana hasta crujientes.","Marca el pescado a la plancha 3 min por lado (o airfryer 180° 8 min).","Termina con limón y sal en escamas."]},
+{n:"Sardinas a la airfryer",role:"cena",m:["a"],cat:"pescado",s:["p","v"],ing:[["Sardinas",600,"g","pesc"],["Limón",1,"ud","fruta"],["Ensalada variada",1,"bolsa","verd"]],r:["Limpia las sardinas y sécalas bien; sal gruesa.","Airfryer 200° 8 min hasta que la piel quede crujiente.","Sirve con limón y una ensalada al lado."]},
+{n:"Mejillones al vapor",role:"cena",m:["t","x"],cat:"pescado",s:["p","v","o","i"],ing:[["Mejillones",1000,"g","pesc"],["Limón",1,"ud","fruta"],["Laurel",2,"hoja","desp"]],r:["Limpia y raspa los mejillones.","Ponlos en una cazuela con laurel, limón y un dedo de agua.","Tapa y cuece a fuego fuerte 5 min, hasta que se abran. Descarta los cerrados."]},
+{n:"Gambas al ajillo con pan",role:"cena",m:["t"],cat:"pescado",s:["p","v","o","i"],ing:[["Gambas peladas",400,"g","pesc"],["Pan",1,"barra","pan"],["Guindilla",2,"ud","desp"]],r:["Dora ajo laminado y guindilla en AOVE abundante a fuego medio.","Sube el fuego y añade las gambas; 2 min y fuera.","Sirve burbujeante con pan para mojar."]},
+{n:"Pechuga de pollo a la plancha con ensalada",role:"cena",m:["t","a"],cat:"carne",s:["p","v","o","i"],ing:[["Pechuga de pollo",4,"ud","carne"],["Ensalada mixta",1,"bolsa","verd"],["Tomate",2,"ud","verd"]],r:["Salpimienta las pechugas (mejor abiertas en filete fino).","Plancha bien caliente 3-4 min por lado.","Sirve sobre la ensalada aliñada."]},
+{n:"Brochetas de pollo a la airfryer",role:"cena",m:["a"],cat:"carne",s:["p","v"],ing:[["Pechuga de pollo",500,"g","carne"],["Pimiento",1,"ud","verd"],["Cebolla",1,"ud","verd"],["Calabacín",1,"ud","verd"]],r:["Adoba el pollo en dados con especias y AOVE 15 min.","Ensarta alternando pollo, pimiento, cebolla y calabacín.","Airfryer 190° 14 min girando las brochetas a mitad."]},
+{n:"Fajitas de pollo",role:"cena",m:["t"],cat:"carne",s:["p","v","o","i"],ing:[["Tortillas de trigo",8,"ud","pan"],["Pechuga de pollo",400,"g","carne"],["Pimiento",2,"ud","verd"],["Cebolla",1,"ud","verd"],["Aguacate",1,"ud","fruta"]],r:["Saltea el pollo en tiras con especias; resérvalo.","En la misma sartén saltea pimiento y cebolla en tiras.","Calienta las tortillas y monta con el pollo, las verduras y aguacate."]},
+{n:"Pizza casera",role:"cena",m:["t"],cat:"masa",s:["p","v","o","i"],ing:[["Base de pizza",2,"ud","pan"],["Tomate triturado",200,"g","desp"],["Mozzarella",200,"g","lact"],["Jamón cocido",100,"g","carne"]],r:["Extiende la base y úntala con tomate sazonado con orégano.","Reparte mozzarella y los ingredientes.","Horno lo más fuerte posible (230-250°) 10 min, mejor con la bandeja precalentada."]},
+{n:"Coca de escalivada",role:"cena",m:["t"],cat:"masa",s:["v","o"],ing:[["Masa de coca",1,"ud","pan"],["Berenjena",1,"ud","verd"],["Pimiento rojo",2,"ud","verd"],["Cebolla",1,"ud","verd"]],r:["Asa berenjena, pimiento y cebolla al horno 40 min; pélalos y córtalos en tiras.","Extiende la escalivada sobre la masa con su jugo y AOVE.","Hornea 12 min a 200°."]},
+{n:"Verduras al horno / airfryer",role:"cena",m:["a"],cat:"verdura",s:["p","v","o","i"],ing:[["Calabacín",1,"ud","verd"],["Berenjena",1,"ud","verd"],["Pimiento",2,"ud","verd"],["Boniato",1,"ud","verd"],["Patata",2,"ud","verd"]],r:["Trocea todo en tamaño similar; aliña con AOVE, sal y hierbas.","Airfryer 200° 18-20 min agitando un par de veces.","Sirve con un yogur batido con ajo si quieres una salsa."]},
+{n:"Champiñones al ajillo",role:"cena",m:["t"],cat:"verdura",s:["o","i"],ing:[["Champiñones",500,"g","verd"],["Perejil",1,"manojo","verd"]],r:["Lamina los champiñones.","Saltéalos a fuego fuerte con ajo picado para que suelten y evaporen el agua.","Termina con perejil, sal y un chorrito de limón."]},
+{n:"Espárragos con huevo poché",role:"cena",m:["t"],cat:"verdura",s:["p"],ing:[["Espárragos verdes",2,"manojo","verd"],["Huevo",4,"ud","huevo"],["Jamón serrano",80,"g","carne"]],r:["Saltea o hierve los espárragos 4 min, que queden al dente.","Escalfa los huevos 3 min en agua con un chorro de vinagre.","Sirve los espárragos con el huevo encima y virutas de jamón."]},
+{n:"Berenjena a la parmesana ligera",role:"cena",m:["t","a"],cat:"verdura",s:["v","o"],ing:[["Berenjena",2,"ud","verd"],["Tomate triturado",300,"g","desp"],["Mozzarella",150,"g","lact"]],r:["Plancha las rodajas de berenjena (o airfryer 180° 10 min) hasta dorar.","Monta capas con tomate y mozzarella en una fuente.","Gratina 10 min hasta que el queso burbujee."]},
+{n:"Ensalada templada de lentejas",role:"cena",m:["t"],cat:"legumbre",s:["o","i"],ing:[["Lentejas cocidas",400,"g","desp"],["Tomate",2,"ud","verd"],["Cebolleta",1,"ud","verd"],["Huevo",2,"ud","huevo"]],r:["Calienta las lentejas cocidas.","Mézclalas tibias con tomate, cebolleta y huevo duro.","Aliña con una vinagreta de mostaza."]},
+{n:"Hummus con crudités y pan de pita",role:"cena",m:["x"],cat:"legumbre",s:["p","v"],ing:[["Garbanzos cocidos",400,"g","desp"],["Tahini",2,"cda","desp"],["Limón",1,"ud","fruta"],["Pan de pita",4,"ud","pan"],["Zanahoria",2,"ud","verd"]],r:["Tritura garbanzos, tahini, ajo, zumo de limón y AOVE hasta una crema (1 min/vel 8).","Si queda espeso, añade un poco de agua fría.","Sirve con pita tostada y bastones de zanahoria y apio."]},
+{n:"Tostas variadas (aguacate y salmón)",role:"cena",m:["t"],cat:"tosta",s:["p","v","o","i"],ing:[["Pan rústico",1,"barra","pan"],["Aguacate",2,"ud","fruta"],["Salmón ahumado",100,"g","pesc"],["Tomate",2,"ud","verd"]],r:["Tuesta rebanadas de pan.","Chafa el aguacate con limón y sal y úntalo.","Corona unas con salmón ahumado y otras con tomate y AOVE."]},
+{n:"Pa amb tomàquet con embutido y queso",role:"cena",m:["t"],cat:"tosta",s:["p","v","o","i"],ing:[["Pan de payés",1,"barra","pan"],["Tomate de untar",4,"ud","verd"],["Jamón serrano",100,"g","carne"],["Queso curado",100,"g","lact"]],r:["Tuesta el pan ligeramente.","Frota con tomate maduro partido, AOVE y sal.","Acompaña con jamón y queso."]},
+{n:"Croquetas caseras con ensalada",role:"cena",m:["a","t"],cat:"fritura",s:["p","v","o","i"],ing:[["Croquetas",16,"ud","cong"],["Ensalada variada",1,"bolsa","verd"],["Tomate",2,"ud","verd"]],r:["Pincela las croquetas con un poco de AOVE.","Airfryer 200° 10 min hasta que estén doradas y crujientes.","Sirve con una ensalada fresca."]},
+{n:"Sopa de noodles con verduras y huevo",role:"cena",m:["t"],cat:"sopa",s:["p","v","o","i"],ing:[["Noodles",200,"g","desp"],["Caldo",1,"l","desp"],["Zanahoria",1,"ud","verd"],["Huevo",2,"ud","huevo"],["Cebolleta",1,"ud","verd"]],r:["Lleva el caldo a ebullición con la zanahoria en juliana.","Añade los noodles y cuece 4 min.","Casca los huevos en el caldo para que escalfen, añade cebolleta y un toque de soja."]}
+];
+
+const DIAS=["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
+const SEASONS=[{k:"p",n:"Primavera",from:1,to:13},{k:"v",n:"Verano",from:14,to:26},{k:"o",n:"Otoño",from:27,to:39},{k:"i",n:"Invierno",from:40,to:52}];
+const GRUPOS={verd:"Verduras y hortalizas",fruta:"Fruta",carne:"Carne y embutido",pesc:"Pescado y marisco",lact:"Lácteos",huevo:"Huevos",desp:"Despensa",pan:"Panadería",cong:"Congelados"};
+const GRUPO_ORDEN=["verd","fruta","carne","pesc","lact","huevo","pan","cong","desp"];
+const METODO={t:["trad","Trad"],x:["tmx","TMX"],a:["air","AF"]};
+function seasonOfWeek(w){return SEASONS.find(s=>w>=s.from&&w<=s.to);}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+
+function buildPlan(){
+  const weeks=[];const lastUsed={};let slot=0;const REPEAT_WINDOW=20;
+  for(let w=1;w<=52;w++){
+    const season=seasonOfWeek(w).k;const rng=mulberry32(w*2654435761>>>0);
+    const days=[];const weekCatCount={comida:{},cena:{}};
+    for(let d=0;d<7;d++){
+      const comida=pick("comida",season,slot,lastUsed,REPEAT_WINDOW,weekCatCount,rng);slot++;
+      const cena=pick("cena",season,slot,lastUsed,REPEAT_WINDOW,weekCatCount,rng);slot++;
+      days.push({comida,cena});
+    }
+    weeks.push({w,season,days});
+  }
+  return weeks;
+}
+function pick(role,season,slot,lastUsed,window,wc,rng){
+  const tries=[
+    di=>di.role===role&&di.s.includes(season)&&(slot-(lastUsed[di.n]??-999))>window&&(wc[role][di.cat]||0)<2,
+    di=>di.role===role&&di.s.includes(season)&&(slot-(lastUsed[di.n]??-999))>window,
+    di=>di.role===role&&di.s.includes(season),
+    di=>di.role===role
+  ];
+  let pool=[];for(const f of tries){pool=D.filter(f);if(pool.length)break;}
+  const chosen=pool[Math.floor(rng()*pool.length)];
+  lastUsed[chosen.n]=slot;wc[role][chosen.cat]=(wc[role][chosen.cat]||0)+1;
+  return chosen;
+}
+function shoppingFor(week){
+  const acc={};
+  for(const day of week.days)for(const dish of [day.comida,day.cena])for(const [n,q,u,c] of dish.ing){
+    const key=n+"|"+u;if(!acc[key])acc[key]={n,u,c,q:0};acc[key].q+=q;
+  }
+  const byGroup={};Object.values(acc).forEach(it=>{(byGroup[it.c]=byGroup[it.c]||[]).push(it);});
+  return byGroup;
+}
+function fmtQty(q,u){let v=Math.round(q*100)/100;if(u==="g"&&v>=1000)return (v/1000)+" kg";if(u==="ml"&&v>=1000)return (v/1000)+" l";if(u==="ud")return v+" ud";return v+" "+u;}
+
+const PLAN=buildPlan();let current=1;
+const $=s=>document.querySelector(s);
+const weeknum=$("#weeknum"),seasonLabel=$("#seasonLabel"),heroTitle=$("#heroTitle"),
+      menu=$("#menu"),shopping=$("#shopping"),ticketWeek=$("#ticketWeek"),weekSelect=$("#weekSelect");
+for(let w=1;w<=52;w++){const s=seasonOfWeek(w);const o=document.createElement("option");o.value=w;o.textContent=`Semana ${w} · ${s.n}`;weekSelect.appendChild(o);}
+
+function methodPills(dish){return dish.m.map(m=>`<span class="m ${METODO[m][0]}">${METODO[m][1]}</span>`).join("");}
+
+function render(){
+  const week=PLAN[current-1];const s=seasonOfWeek(current);
+  document.body.dataset.season=week.season;
+  weeknum.textContent=String(current).padStart(2,"0");
+  seasonLabel.textContent=s.n;heroTitle.textContent=`Semana ${current}`;
+  ticketWeek.textContent=`Semana ${current}`;weekSelect.value=current;
+  document.querySelectorAll(".chip").forEach(c=>{c.setAttribute("aria-current",seasonOfWeek(+c.dataset.w).k===week.season);});
+  menu.innerHTML=week.days.map((day,i)=>`
+    <div class="day">
+      <div class="day-name">${DIAS[i]}</div>
+      ${slotHTML("Comida",i,"comida")}
+      ${slotHTML("Cena",i,"cena")}
+    </div>`).join("");
+  menu.querySelectorAll(".slot").forEach(el=>{
+    el.onclick=()=>openRecipe(+el.dataset.day,el.dataset.role);
+    el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();el.click();}};
+  });
+  const groups=shoppingFor(week);
+  shopping.innerHTML=GRUPO_ORDEN.filter(g=>groups[g]).map(g=>`
+    <div class="cat"><h4>${GRUPOS[g]}</h4>
+      <ul>${groups[g].sort((a,b)=>a.n.localeCompare(b.n)).map(it=>`<li>${it.n}<span>${fmtQty(it.q,it.u)}</span></li>`).join("")}</ul>
+    </div>`).join("");
+}
+function slotHTML(k,dayIdx,role){
+  const dish=PLAN[current-1].days[dayIdx][role];
+  return `<div class="slot" tabindex="0" role="button" data-day="${dayIdx}" data-role="${role}" aria-label="Ver receta de ${dish.n}">
+    <div class="k">${k}</div><div class="dish">${dish.n}</div>
+    <div class="methods">${methodPills(dish)}</div>
+    <div class="seerecipe">Ver receta paso a paso →</div></div>`;
+}
+
+/* ---- modal receta ---- */
+const overlay=$("#overlay");
+function openRecipe(dayIdx,role){
+  const dish=PLAN[current-1].days[dayIdx][role];
+  $("#mKind").textContent=role==="comida"?"Comida":"Cena";
+  $("#mTitle").textContent=dish.n;
+  $("#mMethods").innerHTML=methodPills(dish);
+  $("#mIng").innerHTML=dish.ing.map(([n,q,u])=>`<li>${n}<span>${fmtQty(q,u)}</span></li>`).join("");
+  $("#mSteps").innerHTML=dish.r.map(step=>`<li>${step}</li>`).join("");
+  overlay.classList.add("open");$("#modal").scrollTop=0;
+  $("#closeBtn").focus();
+}
+function closeRecipe(){overlay.classList.remove("open");}
+$("#closeBtn").onclick=closeRecipe;
+overlay.onclick=e=>{if(e.target===overlay)closeRecipe();};
+
+$("#prev").onclick=()=>{current=current>1?current-1:52;render();};
+$("#next").onclick=()=>{current=current<52?current+1:1;render();};
+weekSelect.onchange=e=>{current=+e.target.value;render();};
+document.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{current=+c.dataset.w;render();});
+$("#printBtn").onclick=()=>window.print();
+$("#copyBtn").onclick=()=>{
+  const week=PLAN[current-1];const groups=shoppingFor(week);
+  let txt=`LISTA DE LA COMPRA · Semana ${current} (${seasonOfWeek(current).n})\n\n`;
+  GRUPO_ORDEN.filter(g=>groups[g]).forEach(g=>{txt+=GRUPOS[g].toUpperCase()+"\n";groups[g].sort((a,b)=>a.n.localeCompare(b.n)).forEach(it=>{txt+=`- ${it.n}: ${fmtQty(it.q,it.u)}\n`;});txt+="\n";});
+  navigator.clipboard.writeText(txt).then(()=>{const b=$("#copyBtn");const o=b.textContent;b.textContent="Copiado ✓";setTimeout(()=>b.textContent=o,1600);});
+};
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"&&overlay.classList.contains("open"))closeRecipe();
+  else if(!overlay.classList.contains("open")){if(e.key==="ArrowLeft")$("#prev").click();if(e.key==="ArrowRight")$("#next").click();}
+});
+render();
+</script>
+</body>
+</html>
