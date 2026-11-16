@@ -137,7 +137,7 @@
   <h1 id="title">Dashboard de equipo · n01darts</h1>
   <div class="sub" id="subtitle">Pega la URL del torneo, pulsa Cargar y elige un equipo.</div>
   <div class="controls">
-    <input type="text" id="urlInput" placeholder="https://n01darts.com/n01/tournament/t_stats.html?id=t_XXXX_0000  (o solo t_XXXX_0000)">
+    <input type="text" id="urlInput" placeholder="https://n01darts.com/n01/tournament/t_stats.html?id=t_XXXX_0000 o comp.php?id=…  (o solo t_XXXX_0000)">
     <button id="loadBtn">Cargar</button>
     <select id="teamSel" style="display:none"></select>
   </div>
@@ -160,7 +160,7 @@
 </footer>
 
 <script>
-const API = 'https://tk2-228-23746.vs.sakura.ne.jp/n01/tournament/';
+const API = 'https://lb2.n01darts.com/n01/tournament/';
 const $ = id => document.getElementById(id);
 const GRADS = {
   blue:'linear-gradient(90deg,#3b82f6,#60c5fa)', green:'linear-gradient(90deg,#10b981,#5eead4)',

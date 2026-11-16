@@ -139,7 +139,7 @@
   <h1 id="title">Dashboard n01darts</h1>
   <div class="sub" id="subtitle">Pega la URL del torneo (o su id) y pulsa Cargar.</div>
   <div class="controls">
-    <input type="text" id="urlInput" placeholder="https://n01darts.com/n01/tournament/t_stats.html?id=t_XXXX_0000  (o solo t_XXXX_0000)">
+    <input type="text" id="urlInput" placeholder="https://n01darts.com/n01/tournament/t_stats.html?id=t_XXXX_0000 o comp.php?id=…  (o solo t_XXXX_0000)">
     <select id="minLegs" title="Minimo de legs para rankings de medias">
       <option value="auto" selected>Min. legs: auto</option>
       <option value="0">Sin filtro</option>
@@ -164,12 +164,12 @@
   <div class="card" style="animation-delay:.4s"><h2><span class="dot" style="background:var(--cyan)"></span>Top 10 jugadores · First 9</h2><div class="note" id="n-f9"></div><div id="c-f9"></div></div>
 </div>
 <footer>
-  Fuente: API pública de n01darts (host tk2-228-23746.vs.sakura.ne.jp), consultada en vivo al cargar.
+  Fuente: API pública de n01darts (host lb2.n01darts.com), consultada en vivo al cargar.
   Medias: 3D = puntos/dardos×3 · F9 = puntosF9/dardosF9×3. Rankings de medias filtrados por mínimo de legs (selector).
 </footer>
 
 <script>
-const API = 'https://tk2-228-23746.vs.sakura.ne.jp/n01/tournament/';
+const API = 'https://lb2.n01darts.com/n01/tournament/';
 const $ = id => document.getElementById(id);
 const GRADS = {
   blue:'linear-gradient(90deg,#3b82f6,#60c5fa)', green:'linear-gradient(90deg,#10b981,#5eead4)',
