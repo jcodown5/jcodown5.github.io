@@ -134,6 +134,12 @@
 </head>
 <body>
 <header>
+<nav aria-label="Categorías de estadísticas" style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:16px">
+  <a href="index.html" style="color:var(--text)">Inicio</a>
+  <a id="nav-tournament" href="dashboard.html?id=t_bn9O_4432" style="color:var(--text);">Torneo</a>
+  <a id="nav-team" href="equipo.html?id=t_bn9O_4432" aria-current="page" style="color:var(--text);font-weight:800;">Equipo</a>
+  <a id="nav-women" href="jugadoras.html?id=t_bn9O_4432" style="color:var(--text);">Estadísticas por jugadora</a>
+</nav>
   <h1 id="title">Dashboard de equipo · n01darts</h1>
   <div class="sub" id="subtitle">Pega la URL del torneo, pulsa Cargar y elige un equipo.</div>
   <div class="controls">
@@ -162,6 +168,7 @@
   Fuente: API pública de n01darts, consultada en vivo al cargar. Medias: 3D = puntos/dardos×3 · F9 = puntosF9/dardosF9×3.
 </footer>
 
+<script src="n01-nav.js"></script>
 <script src="n01-detail.js"></script>
 <script>
 const API = 'https://lb2.n01darts.com/n01/tournament/';
@@ -227,6 +234,7 @@ async function load(){
   const id = parseId($('urlInput').value);
   const st = $('status');
   if(!id){ st.textContent = 'No encuentro un id de torneo valido (formato t_XXXX_0000).'; st.className='error'; return; }
+  N01Nav.update(id);
   loading=true; $('loadBtn').disabled=true; $('modeSel').disabled=true;
   $('grid').style.display='none'; $('kpis').style.display='none'; $('detailNote').textContent='';
   S=null; $('teamSel').style.display='none'; $('t-orders').innerHTML='';

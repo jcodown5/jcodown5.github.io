@@ -63,7 +63,7 @@ function aggregate(matches, mode='all'){
           if(points===180)p.ton80++;
           if(closing){
             p.highOut=Math.max(p.highOut,points);own.checkout=points;
-            if(points>=100) highOut.push({tpid:team.tpid,oname:p.oname,schid:match.schid,highOut:points,time:leg.time,mid:match.mid});
+            if(points>=100) highOut.push({tpid:team.tpid,oid:p.oid,opid:p.opid,oname:p.oname,schid:match.schid,highOut:points,time:leg.time,mid:match.mid});
             if(size===1){ const total=(i-1)*3+darts; p.best=p.best?Math.min(p.best,total):total; }
           }
           timeline.push({name:own.oname,points,darts,closing});
