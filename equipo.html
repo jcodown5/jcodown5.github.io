@@ -139,26 +139,30 @@
   <div class="controls">
     <input type="text" id="urlInput" placeholder="https://n01darts.com/n01/tournament/t_stats.html?id=t_XXXX_0000 o comp.php?id=…  (o solo t_XXXX_0000)">
     <button id="loadBtn">Cargar</button>
+    <select id="modeSel" aria-label="Modalidad de las estadísticas individuales"><option value="all">Todas las modalidades</option><option value="1">Individuales</option><option value="2">Parejas</option><option value="3">Tripletas</option></select>
     <select id="teamSel" style="display:none"></select>
   </div>
-  <div id="status"></div>
+  <div id="status" role="status"></div>
+  <p class="sub" id="detailNote"></p>
 </header>
 
 <div class="kpis" id="kpis"></div>
 <div class="grid" id="grid" style="display:none">
-  <div class="card wide" style="animation-delay:.05s"><h2><span class="dot" style="background:var(--blue)"></span>Jugadores del equipo</h2><div class="note">Ordenados por media de 3 dardos · estadísticas completas de la temporada</div><div class="tablewrap" id="t-players"></div></div>
-  <div class="card" style="animation-delay:.1s"><h2><span class="dot" style="background:var(--blue)"></span>Media 3 dardos por jugador</h2><div class="note">Todos los dardos de la temporada</div><div id="c-avg3"></div></div>
-  <div class="card" style="animation-delay:.15s"><h2><span class="dot" style="background:var(--green)"></span>% legs ganados por jugador</h2><div class="note">Legs ganados / legs jugados</div><div id="c-legs"></div></div>
+  <div class="card wide" style="animation-delay:.05s"><h2><span class="dot" style="background:var(--blue)"></span>Jugadores del equipo</h2><div class="note">Posición por media, no orden de tirada · encuentros finalizados · modalidad seleccionada</div><div class="tablewrap" id="t-players"></div></div>
+  <div class="card" style="animation-delay:.1s"><h2><span class="dot" style="background:var(--blue)"></span>Media 3 dardos por jugador</h2><div class="note">Dardos propios en encuentros finalizados · modalidad seleccionada</div><div id="c-avg3"></div></div>
+  <div class="card" style="animation-delay:.15s"><h2><span class="dot" style="background:var(--green)"></span>% legs ganados por jugador</h2><div class="note">Victorias compartidas / legs en cuya alineación figura el jugador</div><div id="c-legs"></div></div>
   <div class="card" style="animation-delay:.2s"><h2><span class="dot" style="background:var(--amber)"></span>180s por jugador</h2><div class="note">Maximazos</div><div id="c-180"></div></div>
-  <div class="card" style="animation-delay:.25s"><h2><span class="dot" style="background:var(--cyan)"></span>First 9 por jugador</h2><div class="note">Media de los 9 primeros dardos</div><div id="c-f9"></div></div>
+  <div class="card" style="animation-delay:.25s"><h2><span class="dot" style="background:var(--cyan)"></span>First 9 por jugador</h2><div class="note">Primeras 3 visitas propias de cada leg (hasta 9 dardos)</div><div id="c-f9"></div></div>
   <div class="card" style="animation-delay:.3s"><h2><span class="dot" style="background:var(--pink)"></span>Cierre más alto por jugador</h2><div class="note">High finish</div><div id="c-hf"></div></div>
-  <div class="card" style="animation-delay:.35s"><h2><span class="dot" style="background:var(--violet)"></span>Mejor leg por jugador</h2><div class="note">Menos dardos para cerrar un leg (menos es mejor)</div><div id="c-best"></div></div>
-  <div class="card wide" style="animation-delay:.4s"><h2><span class="dot" style="background:var(--pink)"></span>Cierres 100+ del equipo</h2><div class="note">Cronología de high finishes registrados en la competición</div><div class="tablewrap" id="t-hf"></div></div>
+  <div class="card" style="animation-delay:.35s"><h2><span class="dot" style="background:var(--violet)"></span>Mejor leg individual</h2><div class="note">Solo legs individuales; los colectivos no se atribuyen como mejor leg personal</div><div id="c-best"></div></div>
+  <div class="card wide" style="animation-delay:.4s"><h2><span class="dot" style="background:var(--pink)"></span>Cierres 100+ del equipo</h2><div class="note">Cierres propios de 100+ en encuentros finalizados · ordenados por puntuación</div><div class="tablewrap" id="t-hf"></div></div>
 </div>
+<section class="card" style="max-width:1320px;margin:16px auto"><h2>Orden de tirada · parejas y tripletas</h2><p class="note">Orden dentro de cada lado; los lados alternan desde el indicado como «sale». El orden se reinicia en cada leg, aplicando los cambios registrados.</p><div id="t-orders" style="overflow-wrap:anywhere"></div></section>
 <footer>
   Fuente: API pública de n01darts, consultada en vivo al cargar. Medias: 3D = puntos/dardos×3 · F9 = puntosF9/dardosF9×3.
 </footer>
 
+<script src="n01-detail.js"></script>
 <script>
 const API = 'https://lb2.n01darts.com/n01/tournament/';
 const $ = id => document.getElementById(id);
@@ -167,6 +171,7 @@ const GRADS = {
   amber:'linear-gradient(90deg,#f59e0b,#fde047)', pink:'linear-gradient(90deg,#ec4899,#f9a8d4)',
   cyan:'linear-gradient(90deg,#06b6d4,#67e8f9)', violet:'linear-gradient(90deg,#8b5cf6,#c4b5fd)'
 };
+let detailMatches = [];
 let S = null; // estado: {id, meta, entries, teams, players, highOut, schedules}
 
 function parseId(text){ const m = String(text).trim().match(/t_[A-Za-z0-9]+_[0-9]+/); return m ? m[0] : null; }
@@ -216,26 +221,33 @@ function schedules(meta){
   return map;
 }
 
+let loading=false;
 async function load(){
+  if(loading)return;
   const id = parseId($('urlInput').value);
   const st = $('status');
   if(!id){ st.textContent = 'No encuentro un id de torneo valido (formato t_XXXX_0000).'; st.className='error'; return; }
+  loading=true; $('loadBtn').disabled=true; $('modeSel').disabled=true;
+  $('grid').style.display='none'; $('kpis').style.display='none'; $('detailNote').textContent='';
+  S=null; $('teamSel').style.display='none'; $('t-orders').innerHTML='';
   st.className=''; st.textContent = 'Cargando datos de ' + id + ' ...';
   try{
     const q = '&tdid=' + id;
-    const [meta, entries, teamStats, playerStats, highOut] = await Promise.all([
+    const [meta, entries, teamStats] = await Promise.all([
       getJSON(API + 'n01_tournament.php?cmd=get_data' + q),
       getJSON(API + 'n01_tournament.php?cmd=get_entry_list' + q),
-      getJSON(API + 'n01_stats_t.php?cmd=stats_list' + q),
-      getJSON(API + 'n01_stats_t.php?cmd=player_stats_list' + q),
-      getJSON(API + 'n01_stats_t.php?cmd=player_high_out' + q)
+      getJSON(API + 'n01_stats_t.php?cmd=stats_list' + q)
     ]);
+    detailMatches = await N01Detail.load(API, id, (n,total)=>st.textContent='Revisando encuentros: '+n+' / '+total);
+    const detail = N01Detail.aggregate(detailMatches, $('modeSel').value);
+    if(!detail.players.length) throw Error('No hay estadísticas verificables para esta modalidad');
     const teamName = {}; (entries||[]).forEach(e => teamName[e.tpid] = e.name);
     S = {
       id, meta,
       teams: Object.entries(teamStats||{}).map(([tpid,t]) => ({...t, tpid, name: teamName[tpid] || tpid})),
-      players: Object.entries(playerStats||{}).map(([oid,p]) => ({...p, oid})),
-      highOut: highOut || [],
+      players: detail.players,
+      detail,
+      highOut: detail.highOut,
       sched: schedules(meta)
     };
     if(!S.players.length){ st.className='error'; st.textContent='Este torneo no tiene stats por jugador (torneo individual). Usa dashboard.html.'; return; }
@@ -248,13 +260,16 @@ async function load(){
     renderTeam(sel.value);
   }catch(e){
     st.className='error';
-    st.textContent = 'Error cargando datos: ' + e.message + ' (revisa el id o la conexion)';
-  }
+    st.textContent = 'No se han podido verificar las estadísticas: ' + e.message + '. Pulsa Cargar para reintentar.';
+    $('grid').style.display='none'; $('kpis').style.display='none';
+  }finally{ loading=false; $('loadBtn').disabled=false; $('modeSel').disabled=false; }
 }
 
 function renderTeam(tpid){
   const t = S.teams.find(x=>x.tpid===tpid);
   if(!t) return;
+  $('detailNote').textContent = 'Estadísticas por visitas y orden real. First 9: primeras 3 visitas propias por leg. Legs ganados: victoria compartida; cierre: solo su autor. Los KPI del equipo corresponden al total oficial de todas las modalidades.' + (S.detail.skipped ? ' Excluidos '+S.detail.skipped+' legs de desempate sin cierre convencional.' : '');
+  N01Detail.render($('t-orders'),S.detail,tpid);
   const players = S.players.filter(p=>p.tpid===tpid).sort((a,b)=>avg3(b)-avg3(a));
   history.replaceState(null,'', location.pathname + '?id=' + S.id + '&team=' + tpid);
 
@@ -285,7 +300,7 @@ function renderTeam(tpid){
   // Tabla completa de jugadores
   $('t-players').innerHTML = '<table><thead><tr><th>#</th><th>Jugador</th><th class="num">PJ</th><th class="num">Sets</th>'+
     '<th class="num">Legs</th><th class="num">Legs G</th><th class="num">% legs</th><th class="num">100+</th><th class="num">140+</th>'+
-    '<th class="num">180s</th><th class="num">Mejor cierre</th><th class="num">Mejor leg</th><th class="num">Media 3D</th><th class="num">First 9</th></tr></thead><tbody>'+
+    '<th class="num">180s</th><th class="num">Puntos propios</th><th class="num">Dardos propios</th><th class="num">Mejor cierre</th><th class="num">Mejor leg</th><th class="num">Media 3D</th><th class="num">First 9</th></tr></thead><tbody>'+
     players.map((p,i)=>{
       const s = splitName(p.oname);
       return '<tr><td><span class="'+rankClass(i)+'">'+(i+1)+'</span></td>'+
@@ -294,6 +309,7 @@ function renderTeam(tpid){
         '<td class="num">'+p.leg+'</td><td class="num">'+p.winLeg+'</td>'+
         '<td class="num">'+fmt(p.leg?100*p.winLeg/p.leg:0,1)+'%</td>'+
         '<td class="num">'+p.ton00+'</td><td class="num">'+p.ton40+'</td><td class="num"><b>'+p.ton80+'</b></td>'+
+        '<td class="num">'+p.score+'</td><td class="num">'+p.darts+'</td>'+
         '<td class="num">'+(p.highOut||'—')+'</td><td class="num">'+(p.best||'—')+'</td>'+
         '<td class="num"><b>'+fmt(avg3(p),2)+'</b></td><td class="num">'+fmt(f9(p),2)+'</td></tr>';
     }).join('')+'</tbody></table>';
@@ -310,7 +326,7 @@ function renderTeam(tpid){
     const worst = Math.max(...bl.map(p=>p.best));
     const maxw = Math.max(...bl.map(p=>worst + 4 - p.best));
     bars('c-best', bl.map(p=>({...P(p), value:p.best, w:Math.max((worst + 4 - p.best)/maxw*100, 24)})), GRADS.violet, 0);
-  } else { $('c-best').innerHTML = '<div class="note">Sin legs ganados todavía.</div>'; }
+  } else { $('c-best').innerHTML = '<div class="note">Sin legs individuales ganados en esta selección.</div>'; }
 
   // Cierres 100+ del equipo
   const hf = S.highOut.filter(e=>e.tpid===tpid).sort((a,b)=>b.highOut-a.highOut || a.time-b.time);
@@ -321,11 +337,12 @@ function renderTeam(tpid){
         return '<tr><td><span class="'+rankClass(i)+'">'+(i+1)+'</span></td><td><b>'+s.name+'</b>'+(s.lic?' <span class="lic">('+s.lic+')</span>':'')+'</td>'+
           '<td>'+(S.sched[e.schid]||e.schid)+'</td><td class="num"><b>'+e.highOut+'</b></td><td class="num">'+fecha(e.time)+'</td></tr>';
       }).join('')+'</tbody></table>'
-    : '<div class="note">Este equipo no tiene cierres de 100+ registrados (la API devuelve los 100 mejores de la competición).</div>';
+    : '<div class="note">Sin cierres de 100+ en los encuentros y la modalidad seleccionados.</div>';
 }
 
 $('loadBtn').addEventListener('click', load);
 $('urlInput').addEventListener('keydown', e => { if(e.key === 'Enter') load(); });
+$('modeSel').addEventListener('change',()=>{if(!S)return;S.detail=N01Detail.aggregate(detailMatches,$('modeSel').value);S.players=S.detail.players;S.highOut=S.detail.highOut;renderTeam($('teamSel').value);});
 $('teamSel').addEventListener('change', () => renderTeam($('teamSel').value));
 
 const urlId = new URLSearchParams(location.search).get('id');
